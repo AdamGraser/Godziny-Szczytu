@@ -390,6 +390,29 @@ public class Map : MonoBehaviour
 			return -1;
 	}
 
+	/* Funkcja rekurencyjna wykorzystywana przez funkcje GetAllCrossings (by MWr) */
+	private void AddNeighboursToList (List<Vector2> CurrentList, Vector2 LastCrossing)
+	{
+		foreach (Vector2 c in FindConnectedCrossroads(LastCrossing))
+		{
+			if (!CurrentList.Contains(c))
+			{
+				CurrentList.Add(c);
+				AddNeighboursToList(CurrentList, c);
+			}
+		}
+	}
+
+	/* Funkcja zwracajaca liste wszystkich wezlow jako liste obiektow typu Vector2 (by MWr) */
+	public List<Vector2> GetAllCrossings()
+	{
+		List<Vector2> crosses = new List<Vector2>();
+		Vector2 last = GetAnyCrossroads();
+		crosses.Add(last);
+		AddNeighboursToList(crosses, last);
+		return crosses;
+	}
+
 	/* lokalna klasa serwujaca pare uzytecznych metod do obliczen matematycznych */
 	private class Math
 	{
