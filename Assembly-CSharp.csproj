@@ -68,6 +68,9 @@
      <Compile Include="Assets\Scripts\Gps.cs" />
      <Compile Include="Assets\Scripts\Map.cs" />
      <Compile Include="Assets\Scripts\SmartGps.cs" />
+ <Reference Include="Fann.Net">
+ <HintPath>Assets\Fann.Net.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

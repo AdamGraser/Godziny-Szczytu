@@ -11,7 +11,7 @@ Platform assembly: C:\Users\Michal\Desktop\Semestr VI\Godziny-Szczytu-Ferdek\God
 Loading C:\Users\Michal\Desktop\Semestr VI\Godziny-Szczytu-Ferdek\Godziny-Szczytu-Ferdek\Godziny_szczytu_Data\Managed\UnityEngine.dll into Unity Child Domain
 Platform assembly: C:\Users\Michal\Desktop\Semestr VI\Godziny-Szczytu-Ferdek\Godziny-Szczytu-Ferdek\Godziny_szczytu_Data\Managed\Assembly-CSharp.dll (this message is harmless)
 Loading C:\Users\Michal\Desktop\Semestr VI\Godziny-Szczytu-Ferdek\Godziny-Szczytu-Ferdek\Godziny_szczytu_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-- Completed reload, in  0.211 seconds
+- Completed reload, in  0.336 seconds
 desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
 <RI> Initializing input.
 XInput1_3.dll not found.
