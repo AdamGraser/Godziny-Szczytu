@@ -46,26 +46,21 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\AgentD.cs" />
+     <Compile Include="Assets\Scripts\CameraControl.cs" />
+     <Compile Include="Assets\Scripts\Clock.cs" />
+     <Compile Include="Assets\Scripts\Controllers\AgentController.cs" />
      <Compile Include="Assets\Scripts\Controllers\Controller.cs" />
      <Compile Include="Assets\Scripts\Controllers\MainContoller.cs" />
+     <Compile Include="Assets\Scripts\Controllers\RegionController.cs" />
      <Compile Include="Assets\Scripts\Controllers\RoadController.cs" />
-     <Compile Include="Assets\Scripts\GUI\AddRoadButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\AgentMenuButton.cs" />
+     <Compile Include="Assets\Scripts\Controllers\TimeController.cs" />
      <Compile Include="Assets\Scripts\GUI\Button.cs" />
-     <Compile Include="Assets\Scripts\GUI\ExitButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\FasterButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\HelpButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\LoadButton.cs" />
      <Compile Include="Assets\Scripts\GUI\Menu.cs" />
-     <Compile Include="Assets\Scripts\GUI\PauseButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\RegionMenuButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\RemoveRoadButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\RoadMenuButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\SaveButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\SlowerButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\SmartAgentMenuButton.cs" />
-     <Compile Include="Assets\Scripts\GUI\TimeMenu.cs" />
+     <Compile Include="Assets\Scripts\Gps.cs" />
      <Compile Include="Assets\Scripts\Map.cs" />
+     <Compile Include="Assets\Scripts\MapExample.cs" />
+     <Compile Include="Assets\Scripts\Region.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

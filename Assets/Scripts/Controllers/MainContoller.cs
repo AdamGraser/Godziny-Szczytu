@@ -8,8 +8,7 @@ public class MainContoller : Controller
 	/* prefaby kontrolerow */
 	public GameObject roadControllerPrefab;
 	public GameObject regionControllerPrefab;
-	public GameObject AgentControllerPrefab;
-	public GameObject SuperAgentControllerPrefab;
+	public GameObject agentControllerPrefab;
 
 	public override Event LastEvent
 	{
@@ -20,23 +19,18 @@ public class MainContoller : Controller
 			{
 			case Event.RoadMenuButtonClicked:
 				base.LastEvent = value;
-				RoadMenuButtonAction();
+				activeAction = RoadMenuButtonAction;
 				break;
 			case Event.RegionMenuButtonClicked:
 				base.LastEvent = value;
-				RegionMenuButtonAction();
+				activeAction = RegionMenuButtonAction;
 				break;
 			case Event.AgentMenuButtonClicked:
 				base.LastEvent = value;
-				AgentMenuButtonAction();
-				break;
-			case Event.SuperAgentMenuButtonClicked:
-				base.LastEvent = value;
-				SuperAgentMenuButtonAction();
+				activeAction = AgentMenuButtonAction;
 				break;
 			default:
-				if(activeController != null)
-					activeController.LastEvent = value;
+				Debug.LogWarning("Przyjeto nieobslugiwane zdarzenie");
 				break;
 			}
 		}
@@ -48,7 +42,12 @@ public class MainContoller : Controller
 	}
 
 	/* aktywny kontroller, ktory przyjmuje aktualnie zdarzenia nieobslugiwane przez MainController */
-	private Controller activeController;
+	private GameObject activeController;
+
+	void Start()
+	{
+		isActionContinous = false;
+	}
 
 	/* ustawia nowy aktywny kontroler. Nie mozna wykorzystywac tej wlasciwosci do odczytywania */
 	private GameObject ActiveController
@@ -59,18 +58,11 @@ public class MainContoller : Controller
 			if(activeController != null)
 				Destroy(activeController);
 
-			GameObject controller = (GameObject)Instantiate(value);
-			activeController = controller.GetComponent<Controller>();
+			activeController = (GameObject)Instantiate(value);
 		}
 	}
 
 	/* -------------------- WLASCIWE FUNKCJE -------------------- */
-		
-	/* wykonuj operacje w zaleznosci od ostatniego zgloszonego eventu.
-	 * aktualnie nie ma zadnych akcji, ktore trzeba by wykonywac cyklicznie */
-	public override void Update()
-	{
-	}
 
 	/* obsluguje nacisniecie przycisku RoadMenuButton. 
 	 * tworzy i ustawia RoadController jako aktywny.
@@ -83,19 +75,14 @@ public class MainContoller : Controller
 	/* obsluguje nacisniecie przycisku RegionMenuButton. */
 	private void RegionMenuButtonAction()
 	{
-
+		ActiveController = regionControllerPrefab;
 	}
 
 	/* obsluguje nacisniecie przycisku AgentMenuButton. */
 	private void AgentMenuButtonAction()
 	{
-		
+		ActiveController = agentControllerPrefab;
 	}
 
-	/* obsluguje nacisniecie przycisku SuperAgentMenuButton. */
-	private void SuperAgentMenuButtonAction()
-	{
-		
-	}
 
 }

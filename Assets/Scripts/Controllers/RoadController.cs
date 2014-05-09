@@ -7,13 +7,13 @@ public class RoadController : Controller
 	/* prefaby obiektow oraz pola przechowujace referencje ich obiektow */
 	/* podmenu do zarzadzania drogami */
 	public GameObject roadMenuPrefab;
-	private Menu roadMenu = null;
+	private GameObject roadMenu = null;
 	/* grid wyznaczajacy miejsca, na ktorych mozna umieszczac drogi */
 	public GameObject gridPrefab;
 	private GameObject grid = null;
 	/* sietka pokazujaca mozliwe punkty, w ktorych mozna postawic droge */
 	public GameObject possibleRoadDirectionsPrefab;
-	private GameObject possibleRoadDirections;
+	private GameObject possibleRoadDirections = null;
 
 	/* pozycja skrzyzowania zaznaczonego/utworzonego przez uzytkownika. 
 	 * Potrzebne do tworzenia drog */
@@ -49,31 +49,26 @@ public class RoadController : Controller
 	/* wygeneruj grid oraz podmenu */
 	public void Start()
 	{
-		GameObject menu = (GameObject)Instantiate(roadMenuPrefab);
-		roadMenu = menu.GetComponent<Menu>();
-		roadMenu.listener = this;
+		roadMenu = (GameObject)Instantiate(roadMenuPrefab);
+		Menu menu = roadMenu.GetComponent<Menu>();
+		menu.listener = this;
 
 		crossSelected = false;
 
 		grid = (GameObject)Instantiate(gridPrefab);
 
 		map = (Map)GameObject.FindGameObjectWithTag("Map").GetComponent("Map");
-	}
-	
-	/* wykonuj operacje w zaleznosci od ostatniego zgloszonego eventu */
-	public override void Update()
-	{
-		if(activeAction != null)
-			activeAction();
+
+		isActionContinous = true;
 	}
 
 	/* niszczy grid i menu */
 	public void OnDestroy()
 	{
 		map.RemoveLonelyCrossroads();
-		GameObject.Destroy(grid);
-		GameObject.Destroy(roadMenu);
-		GameObject.Destroy(possibleRoadDirections);
+		Destroy(grid);
+		Destroy(roadMenu);
+		Destroy(possibleRoadDirections);
 	}
 		
 	/* w miejcu klikniecia tworzy skrzyzowanie i/lub droge */

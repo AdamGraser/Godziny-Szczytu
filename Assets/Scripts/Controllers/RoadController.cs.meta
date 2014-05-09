@@ -2,7 +2,10 @@ fileFormatVersion: 2
 guid: 797eaab5065b2aa48998c31a18b7dd52
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - roadMenuPrefab: {fileID: 100002, guid: 049c92d54ae204142807d492cde1ee4e, type: 2}
+  - gridPrefab: {instanceID: 0}
+  - possibleRoadDirectionsPrefab: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

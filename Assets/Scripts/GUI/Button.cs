@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/* abstrakcyjna klasa narzucajaca interfejs buttona */
-public abstract class Button : MonoBehaviour 
+/* klasa buttona */
+public class Button : MonoBehaviour 
 {
 	/* tekstura (ikona) przycisku */
 	public Texture2D icon;
@@ -14,6 +14,9 @@ public abstract class Button : MonoBehaviour
 	private Controller listener;
 	public Controller Listener {set; get;}
 
+	/* typ eventu (jego nazwa), ktora bedzie przesylana do listenera */
+	public Controller.Event eventName;
+
 	/* Rysuje przycisk. 
 	 * rect - pozycja i wymiary przycisku. 
 	 * listener - kontroller nasluchujacy nacisniecie przycisku 
@@ -24,6 +27,9 @@ public abstract class Button : MonoBehaviour
 		return GUI.Button(new Rect(rect.x, rect.y, rect.width, rect.height), new GUIContent(icon));
 	}
 
-	/* Akcja, ktora zostanie wykonan po nacisnieciu przycisku */
-	public abstract void OnClick();
+	/* Akcja, ktora zostanie wykonana po nacisnieciu przycisku */
+	virtual public void OnClick()
+	{
+		Listener.LastEvent = eventName;
+	}
 }

@@ -11,6 +11,7 @@ public class Map : MonoBehaviour
 		private Vector2 end;
 		private float length = 0;
 		private GameObject model;
+		private Region region = Region.Neutral;
 
 		/* punkt poczatkowy drogi */
 		public Vector2 Start
@@ -58,6 +59,20 @@ public class Map : MonoBehaviour
 			}
 		}
 
+		/* miejski region, do ktorego nalezy skrzyzowanie */
+		public Region CityRegion
+		{
+			set
+			{
+				region = value;
+			}
+			get
+			{
+				return region;
+			}
+		}
+
+
 		/* oblicza dlugosc drogi. Jezeli start lub end sa null, wtedy dlugosc wynosi 0 */
 		private void CalculateLength()
 		{
@@ -81,6 +96,7 @@ public class Map : MonoBehaviour
 		private Vector2 position;
 		/* polaczenia z innymi skrzyzowaniami. kluczem jest pozycja (x, y) */
 		private Dictionary<Vector2, Crossroads> connectedCrossroads;
+		private Region region;
 
         /* fizyczny/graficzny model */
         public GameObject Model
@@ -106,6 +122,19 @@ public class Map : MonoBehaviour
 			get
 			{
 				return connectedCrossroads;
+			}
+		}
+
+		/* miejski region, do ktorego nalezy skrzyzowanie */
+		public Region CityRegion
+		{
+			set
+			{
+				region = value;
+			}
+			get
+			{
+				return region;
 			}
 		}
 
@@ -144,7 +173,7 @@ public class Map : MonoBehaviour
 	private Dictionary<Vector2, Road> roads; 
 
 	/* ekwiwalent konstruktora */
-	public void Start () 
+	public void Awake() 
 	{
 		crossroads = new Dictionary<Vector2, Crossroads>();
 		roads = new Dictionary<Vector2, Road>();
@@ -210,10 +239,10 @@ public class Map : MonoBehaviour
 			road.Model.transform.Translate(new Vector3(roadPos.x, 0.0f, roadPos.y));
 
 			//nadaj odpowiednia dlugosc
-			road.Model.transform.localScale = new Vector3(0.1f, 1.0f, road.Length * road.Model.transform.localScale.z);
+			road.Model.transform.localScale = new Vector3(1.0f, 1.0f, road.Length);
 
 			//obroc pod odpowiednim katem
-			roadAngle = (cross1Pos.x - cross2Pos.x)/ (cross1Pos.y - cross2Pos.y);
+			roadAngle = (cross1Pos.x - cross2Pos.x) / (cross1Pos.y - cross2Pos.y);
 			roadAngle = Mathf.Atan(roadAngle);
 			road.Model.transform.Rotate(new Vector3(0, roadAngle * Mathf.Rad2Deg, 0));
 
@@ -324,6 +353,12 @@ public class Map : MonoBehaviour
 		return null;
 	}
 
+	/*czy istnieje skrzyzowanie object podanej pozycji */
+	public bool DoCrossroadsExist(Vector2 pos)
+	{
+		return crossroads.ContainsKey(pos);
+	}
+
 	/* usuwa 'sametne' skrzyzowania, ktore nie sa polaczone z zadnymi innymi */
 	public void RemoveLonelyCrossroads()
 	{
@@ -362,6 +397,17 @@ public class Map : MonoBehaviour
 		return pos;
 	}
 
+	/* zwraca liste wszystkich pozycji skrzyzowan */
+	public List<Vector2> GetAllCrossroads()
+	{
+		List<Vector2> l = new List<Vector2>();
+
+		foreach(var c in crossroads)
+			l.Add(c.Key);
+
+		return l;
+	}
+
 	/* zwraca pozycje skrzyzowan polaczonych droga ze skrzyzowaniem o pozycji cross. 
 	 * jesli nie istnieje podane skrzyzowanie, zwracana jest wartosc null */
 	public List<Vector2> FindConnectedCrossroads(Vector2 crossPos)
@@ -388,6 +434,53 @@ public class Map : MonoBehaviour
 			return road.Length;
 		else
 			return -1;
+	}
+
+	/* zmienia strefe miejska skrzyzowania na podana w region
+	 * pos - pozycja skrzyzowania */
+	public void ChangeCrossroadsRegion(Vector2 pos, Region region)
+	{
+		Crossroads cross = crossroads[pos];
+
+		if(cross != null)
+		{
+			cross.CityRegion = region;
+
+			//ustaw region ulic polaczonych z tym skrzyzowaniem na taki sam lub 'posredni'
+			foreach(var c in cross.ConnectedCrossroads)
+				ChangeRoadRegion(cross.Position, c.Value.Position);
+		}
+	}
+
+	/* zmienia region drogi, dostosowujac go do regionow skrzyzowan */
+	private void ChangeRoadRegion(Vector2 cross1, Vector2 cross2)
+	{
+		Road road = roads[(cross1 + cross2) / 2];
+
+		if(crossroads[cross1].CityRegion == crossroads[cross2].CityRegion)
+			road.CityRegion = crossroads[cross1].CityRegion;
+		else
+			road.CityRegion = Region.Neutral;
+	}
+
+	/* zwraca liste pozycji skrzyzowan danego regionu */
+	public List<Vector2> GetCrossroadListWithRegion(Region region)
+	{
+		List<Vector2> list = new List<Vector2>();
+
+		foreach(var c in crossroads)
+		{
+			if(c.Value.CityRegion == region)
+				list.Add(c.Value.Position);
+		}
+
+		return list;
+	}
+
+	/* zwraca region danego skrzyzowania */
+	public Region GetCrossroadsRegion(Vector2 pos)
+	{
+		return crossroads[pos].CityRegion;
 	}
 
 	/* lokalna klasa serwujaca pare uzytecznych metod do obliczen matematycznych */
