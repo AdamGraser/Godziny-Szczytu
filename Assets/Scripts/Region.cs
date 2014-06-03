@@ -5,6 +5,6 @@ using System.Collections;
 public enum Region
 {
 	Neutral,
-	Urban,
+	Residential,
 	Industrial
 }

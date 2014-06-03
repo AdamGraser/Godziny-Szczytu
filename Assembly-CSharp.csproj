@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{78B42BEC-C559-63E3-6996-7DE1ABC1B6B0}</ProjectGuid>
+	<ProjectGuid>{6F06A7BB-44D6-0242-5868-7D4212EC985D}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -47,20 +47,28 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\AgentD.cs" />
+     <Compile Include="Assets\Scripts\AgentFileContent.cs" />
+     <Compile Include="Assets\Scripts\AgentS.cs" />
+     <Compile Include="Assets\Scripts\Box.cs" />
+     <Compile Include="Assets\Scripts\Button.cs" />
      <Compile Include="Assets\Scripts\CameraControl.cs" />
      <Compile Include="Assets\Scripts\Clock.cs" />
-     <Compile Include="Assets\Scripts\Controllers\AgentController.cs" />
-     <Compile Include="Assets\Scripts\Controllers\Controller.cs" />
-     <Compile Include="Assets\Scripts\Controllers\MainContoller.cs" />
-     <Compile Include="Assets\Scripts\Controllers\RegionController.cs" />
-     <Compile Include="Assets\Scripts\Controllers\RoadController.cs" />
-     <Compile Include="Assets\Scripts\Controllers\TimeController.cs" />
-     <Compile Include="Assets\Scripts\GUI\Button.cs" />
-     <Compile Include="Assets\Scripts\GUI\Menu.cs" />
+     <Compile Include="Assets\Scripts\Controller.cs" />
+     <Compile Include="Assets\Scripts\Crossroads.cs" />
+     <Compile Include="Assets\Scripts\FadingBox.cs" />
+     <Compile Include="Assets\Scripts\GUI.cs" />
      <Compile Include="Assets\Scripts\Gps.cs" />
      <Compile Include="Assets\Scripts\Map.cs" />
      <Compile Include="Assets\Scripts\MapExample.cs" />
+     <Compile Include="Assets\Scripts\MapFileContent.cs" />
+     <Compile Include="Assets\Scripts\Menu.cs" />
      <Compile Include="Assets\Scripts\Region.cs" />
+     <Compile Include="Assets\Scripts\Road.cs" />
+     <Compile Include="Assets\Scripts\SimulationFileContent.cs" />
+     <Compile Include="Assets\Scripts\SmartGps.cs" />
+     <Compile Include="Assets\Scripts\TrafficLight.cs" />
+     <Compile Include="Assets\Scripts\Vector2Serializable.cs" />
+     <Compile Include="Assets\Scripts\Wall.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

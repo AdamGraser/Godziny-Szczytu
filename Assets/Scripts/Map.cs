@@ -1,511 +1,309 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using UnityEngine;
 
 /* Reprezentuje mape w postaci grafu (polaczonych ze soba punktow z okresleniem dlugosci pomiedzy nimi. */
-public class Map : MonoBehaviour 
+[Serializable()]
+public class Map : MonoBehaviour, ISerializable
 {
-	/* reprezentuje skrzyzowanie */
-    private class Road
-	{
-		private Vector2 start;
-		private Vector2 end;
-		private float length = 0;
-		private GameObject model;
-		private Region region = Region.Neutral;
-
-		/* punkt poczatkowy drogi */
-		public Vector2 Start
-		{
-			set
-			{
-				start = new Vector2(value.x, value.y);
-				CalculateLength();
-			}
-			get
-			{
-				return start;
-			}
-		}
-
-		/* punkt koncowy drogi */
-		public Vector2 End
-		{
-			set
-			{
-				end = new Vector2(value.x, value.y);
-				CalculateLength();
-			}
-			get
-			{
-				return end;
-			}
-		}
-
-		/* dlugosc drogi */
-		public float Length
-		{
-			get
-			{
-				return length;
-			}
-		}
-
-		/* fizyczny/graficzny model drogi */
-		public GameObject Model
-		{
-			get
-			{
-				return model;
-			}
-		}
-
-		/* miejski region, do ktorego nalezy skrzyzowanie */
-		public Region CityRegion
-		{
-			set
-			{
-				region = value;
-			}
-			get
-			{
-				return region;
-			}
-		}
-
-
-		/* oblicza dlugosc drogi. Jezeli start lub end sa null, wtedy dlugosc wynosi 0 */
-		private void CalculateLength()
-		{
-			length = Mathf.Sqrt(Mathf.Pow(start.x - end.x, 2) + Mathf.Pow(start.y - end.y, 2));
-		}
-
-		/* konstruktor.
-		 * model - fizyczny/graficzny model drogi */
-		public Road(GameObject model)
-		{
-			this.model = model;
-		}
-	}
-
-	/* ------------------------------------- */
-
-    /* reprezentuje skrzyzowanie */
-    private class Crossroads
-    {
-        private GameObject model;
-		private Vector2 position;
-		/* polaczenia z innymi skrzyzowaniami. kluczem jest pozycja (x, y) */
-		private Dictionary<Vector2, Crossroads> connectedCrossroads;
-		private Region region;
-
-        /* fizyczny/graficzny model */
-        public GameObject Model
-        {
-            get
-            {
-                return model;
-            }
-        }
-
-        /* pozycja skrzyzowania */
-        public Vector2 Position
-        {
-            get
-            {
-				return position;
-            }
-        }
-
-		/* polaczenia z innymi skrzyzowaniami */
-		public Dictionary<Vector2, Crossroads> ConnectedCrossroads
-		{
-			get
-			{
-				return connectedCrossroads;
-			}
-		}
-
-		/* miejski region, do ktorego nalezy skrzyzowanie */
-		public Region CityRegion
-		{
-			set
-			{
-				region = value;
-			}
-			get
-			{
-				return region;
-			}
-		}
-
-		/* konstruktor
-		 * model - model fizyczny/graficzny skrzyzowania */
-		public Crossroads(GameObject model)
-		{
-			this.model = model;
-			position = new Vector2(model.transform.position.x, model.transform.position.z);
-			connectedCrossroads = new Dictionary<Vector2, Crossroads>();
-		}
-
-		/* konstruktor
-		 * model - model fizyczny/graficzny skrzyzowania 
-		 * pos - pozycja skrzyzowaania */
-		public Crossroads(GameObject model, Vector2 pos)
-		{
-			this.model = model;
-			this.model.transform.Translate(new Vector3(pos.x, 0, pos.y));
-			position = pos;
-			connectedCrossroads = new Dictionary<Vector2, Crossroads>();
-		}
-       
-    }
-
-    /* ------------------------------------- */
-
-    /* prefab skrzyzowania */
     public GameObject crossroadsPrefab;
-    /* prefab drogi */
     public GameObject roadPrefab;
 
-	/* zbior skrzyzowan. kluczem jest pozycja (x, y) */
-	private Dictionary<Vector2, Crossroads> crossroads;
-	/* zbior drog, ktore lacza skrzyzowania. kluczem jest pozycja srodka drogi (x, y) */
-	private Dictionary<Vector2, Road> roads; 
+    private Dictionary<Vector2, Crossroads> crossroads; //zbior skrzyzowan. kluczem jest ich logiczna pozycja
+    public Dictionary<Vector2, Crossroads> AllCrossroads { get { return crossroads; } } 
+    private Dictionary<Vector2, Road> roads; //zbior drog. kluczem jest ich punkt srodkowy
+    public Dictionary<Vector2, Road> AllRoads { get { return roads; } }
 
-	/* ekwiwalent konstruktora */
-	public void Awake() 
-	{
-		crossroads = new Dictionary<Vector2, Crossroads>();
-		roads = new Dictionary<Vector2, Road>();
-	}
+    /* ***********************************************************************************
+     *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
+     * *********************************************************************************** */
+    void Awake()
+    {
+        crossroads = new Dictionary<Vector2, Crossroads>();
+        roads = new Dictionary<Vector2, Road>();
+    }
 
-	/* tworzy i dodaje do mapy skrzyzowanie.
-	 * pos - pozycja skrzyzowania
-	 * zwraca: true, jesli skrzyzowanie dodane; false - w przeciwnym wypadku */
-	public bool AddCrossroads(Vector2 pos)
-	{
-		bool returnVal = false;
-		Crossroads cross; //nowoutworzone skrzyzowanie
+    /* ***********************************************************************************
+     *              FUNKCJE PUBLICZNE DODAJACE / USUWAJACE DROGI I SKRZYZOWANIA
+     * *********************************************************************************** */
 
-		//jesli skrzyzowanie na danej pozycji juz istnieje, to nie dodawaj nowego
-		if(!crossroads.ContainsKey(pos))
-		{
-			cross = new Crossroads((GameObject)Instantiate(crossroadsPrefab), pos);
-			crossroads.Add(pos, cross);
+    /* dodaje skrzyzowanie na podana pozycje logiczna */
+    public void AddCrossroads(Vector2 pos)
+    {
+        Crossroads cross; //nowoutworzone skrzyzowanie
 
-			//jezeli skrzyzowanie zostalo postawione na drodze, to ja podziel i polacz z tym skrzyzowaniem
-			var crossArray = FindRoadContainingPoint(pos);
-			if(crossArray != null)
-			{
-				var c1 = crossroads[crossArray[0]];
-				var c2 = crossroads[crossArray[1]];
+        if(!crossroads.ContainsKey(pos))
+        {
+            cross = ((GameObject)Instantiate(crossroadsPrefab)).GetComponent<Crossroads>();
+            cross.LogicPosition = pos;
+            crossroads.Add(pos, cross);
+        }
+    }
 
-				RemoveRoad(c1.Position, c2.Position);
-				AddRoad(c1.Position, pos);
-				AddRoad(pos, c2.Position);
-			}
+    /* usuwa skrzyzowanie znajdujace sie na podanej pozycji, wraz z polaczonymi drogami */
+    public void RemoveCrossroads(Vector2 pos)
+    {
+        Crossroads cross; //skrzyzowanie do usuniecia
+        List<Vector2> roadsToDelete = new List<Vector2>(); //jedne z dwoch koncow drog, ktore nalezu usunac
 
-			returnVal = true;
-		}
+        if(crossroads.ContainsKey(pos))
+        {
+            cross = crossroads[pos];
 
-		return returnVal;
-	}
+            //usun drogi miedzy skrzyzowaniami
+            foreach(var c in cross.ConnectedCrossroads)
+                roadsToDelete.Add(c.Value.LogicPosition);
+            foreach(var r in roadsToDelete)
+                RemoveRoad((pos + r) / 2);
 
-	/* dodaje droge laczaca dwa skrzyzowania
-	 * cross1Pos, cross2Pos - skrzyzowania, ktore maja zostac polaczone
-	 * zwraca: true, gdy droga zostanie dodana; false - w przeciwnym wypadku */
-	public bool AddRoad(Vector2 cross1Pos, Vector2 cross2Pos)
-	{
-		bool returnVal = false;
-		Road road; //nowoutworzona droga
-		Vector2 roadPos; //punkt srodkowy drogi
-		float roadAngle = 0; //kat obrotu drogi w radianach
-		Crossroads cross1 = crossroads[cross1Pos];
-		Crossroads cross2 = crossroads[cross2Pos]; 
+            //usun samo skrzyzowanie
+            crossroads.Remove(pos);
+            GameObject.Destroy(cross.gameObject);
+        }
+    }
 
-		//jesli polaczenie istnieje, to nic nie rob. nei lacz tez skryzowania z samym soba
-		//nie dodawal drogi, gdy moglaby przecinac inna droge
-		if(cross1 != null && cross2 != null && cross1Pos != cross2Pos && !cross1.ConnectedCrossroads.ContainsKey(cross2Pos) &&
-		   FindRoadCrossingRoad(cross1Pos, cross2Pos) == null)
-		{
-			road = new Road((GameObject)Instantiate(roadPrefab));
+    /* tworzy droga znajdujaca sie miedzy podanymi skrzyzowaniami. 
+     * nastepnie tworzy polaczenia miedzy nimi (logiczne, nizszy poziom abstrakcji ;) ) 
+     * c1Pos, c2Pos - pozycje skrzyzowan, pomiedzy ktorymi ma znajdowac sie droga */
+    public void AddRoad(Vector2 c1Pos, Vector2 c2Pos)
+    {
+        Road road;
+        float angle; //obrot drogi
+        Crossroads c1;
+        Crossroads c2;
 
-			//nadaj punkty koncowe
-			road.Start = cross1Pos;
-			road.End = cross2Pos;
+        try
+        {
+            c1 = crossroads[c1Pos];
+            c2 = crossroads[c2Pos];
 
-			//nadaj odpowiednie polozenie drogi
-			roadPos = new Vector2((cross1Pos.x + cross2Pos.x) / 2.0f, (cross1Pos.y + cross2Pos.y) / 2.0f);
-			road.Model.transform.Translate(new Vector3(roadPos.x, 0.0f, roadPos.y));
+            //skrzyzowania nie moge byc juz polaczone
+            if(c1 != null && c2 != null && !c1.ConnectedCrossroads.ContainsKey(c2Pos))
+            {
+                road = ((GameObject)Instantiate(roadPrefab)).GetComponent<Road>();
 
-			//nadaj odpowiednia dlugosc
-			road.Model.transform.localScale = new Vector3(1.0f, 1.0f, road.Length);
+                //nadaj punkty koncowe
+                road.Start = c1;
+                road.End = c2;
 
-			//obroc pod odpowiednim katem
-			roadAngle = (cross1Pos.x - cross2Pos.x) / (cross1Pos.y - cross2Pos.y);
-			roadAngle = Mathf.Atan(roadAngle);
-			road.Model.transform.Rotate(new Vector3(0, roadAngle * Mathf.Rad2Deg, 0));
+                //nadaj odpowiednie polozenie drogi
+                road.LogicPosition = (c1Pos + c2Pos) / 2f;
 
-			//dodaj droge do kolekcji
-			roads.Add(roadPos, road);
+                //nadaj odpowiednia dlugosc
+                road.transform.localScale = new Vector3(1, 1, road.Length);
 
-            //polacz logicznie ze soba skrzyzowania
-            cross1.ConnectedCrossroads.Add(cross2Pos, cross2);
-            cross2.ConnectedCrossroads.Add(cross1Pos, cross1);
+                //obroc pod odpowienim katem
+                angle = Mathf.Atan((c1Pos.x - c2Pos.x) / (c1Pos.y - c2Pos.y));
+                road.transform.Rotate(0, angle * Mathf.Rad2Deg, 0);
 
-			returnVal = true;
-		}
+                //dodaj do kolekcji
+                roads.Add(road.LogicPosition, road);
 
-		return returnVal;
-	}
+                //polacz ze soba logicznie skrzyzowania
+                c1.Connect(c2);
+                c2.Connect(c1);
+            }
+        }
+        catch(KeyNotFoundException)
+        {
+            Debug.LogWarning("Nie znaleziono podanego klucza");
+        }
+    }
 
-	/* usuwa skrzyzowanie o podanej pozycji. niszczy tez wszelkie drogi polaczone z tym skrzyzowaniem oraz polaczenia logiczne
-	 * zwraca: true, jesli skrzyzowanie zostanie usuniete; false - w przeciwnym wypadku */
-	public bool RemoveCrossroads(Vector2 pos)
-	{
-		bool returnVal = false;
-		Crossroads cross; //skrzyzowanie do usuniecia
-		List<Vector2> roadsToDelete = new List<Vector2>();
+    /* usuwa droge i polaczenia miedzy skrzyzowaniani 
+     * pos - punkt srodkowy drogi */
+    public void RemoveRoad(Vector2 pos)
+    {
+        Road road;
+        Crossroads c1;
+        Crossroads c2;
 
-		if(crossroads.ContainsKey(pos))
-		{
-			cross = crossroads[pos];
+        if(roads.ContainsKey(pos))
+        {
+            road = roads[pos];
+            c1 = crossroads[road.Start.LogicPosition];
+            c2 = crossroads[road.End.LogicPosition];
 
-			//usun polaczenia (logiczne oraz drogi)
-			foreach(var c in cross.ConnectedCrossroads)
-				roadsToDelete.Add(c.Value.Position);
-			foreach(var r in roadsToDelete)
-				RemoveRoad(pos, r);
+            //usun polaczenie logiczne
+            c1.Disconnect(c2);
+            c2.Disconnect(c1);
 
-			//usun samo skrzyzowanie
-			GameObject.Destroy(cross.Model);
-			returnVal = crossroads.Remove(cross.Position);
-		}
+            //usun sama droge
+            GameObject.Destroy(road.gameObject);
+            roads.Remove(pos);
+        }
+    }
 
-		return returnVal;
-	}
+    /* ***********************************************************************************
+     *                             POZOSTALE FUNKCJE PUBLICZNE
+     * *********************************************************************************** */
 
-	/* usuwa droge laczaca skrzyzowania o podanych pozycjach. usuwa tez polaczenie logiczne miedzy skrzyzowaniami*/
-	public bool RemoveRoad(Vector2 cross1Pos, Vector2 cross2Pos)
-	{
-		bool returnVal = false;
-		Crossroads cross1 = crossroads[cross1Pos];
-		Crossroads cross2 = crossroads[cross2Pos];
-		Vector2 roadPos;
-		Road road; //droga do usuniecia
+    /* zwraca droge, ktora zawiera w sobie podany punkt.
+     * jesli taka drogi nie istnieje, zwraca null */
+    public Road FindRoadContainingPoint(Vector2 point)
+    {
+        foreach(var r in roads)
+        {
+            if(Math.IsPointBelongingToSegment(r.Value.Start.LogicPosition, r.Value.End.LogicPosition, point))
+                return r.Value;
+        }
 
-		if(cross1 != null && cross2 != null && cross1 != cross2)
-		{
-			roadPos = (cross1Pos + cross2Pos) / 2.0f;
-			road = roads[roadPos];
+        return null;
+    }
 
-			if(road != null)
-			{
-				GameObject.Destroy(road.Model);
-				returnVal = roads.Remove(roadPos);
-				
-				//usun polaczeni logiczne miedzy skrzyzowaniami
-				cross1.ConnectedCrossroads.Remove(cross2Pos);
-				cross2.ConnectedCrossroads.Remove(cross1Pos);
-			}
-		}
+    /* znajduje i zwraca droge, ktora przecina podana droge road.
+     * zwraca null, jesli nie istnieje zadna taka droga 
+     * c1, c2 - konce drogi */
+    public Road FindRoadIntersectingRoad(Crossroads c1, Crossroads c2)
+    {
+        //sprawdzanie kazdej drogi
+        foreach(var r in roads)
+        {
+            //sprawdz, czy odcinki sie przecinaja (zrodlo: http://www.algorytm.org/geometria-obliczeniowa/przecinanie-sie-odcinkow.html )
+            if(Math.Det(c1.LogicPosition, c2.LogicPosition, r.Value.Start.LogicPosition) *
+               Math.Det(c1.LogicPosition, c2.LogicPosition, r.Value.End.LogicPosition) < 0 &&
+               Math.Det(r.Value.Start.LogicPosition, r.Value.End.LogicPosition, c1.LogicPosition) *
+               Math.Det(r.Value.Start.LogicPosition, r.Value.End.LogicPosition, c2.LogicPosition) < 0)
+            {
+                return r.Value;
+            }
 
-		return returnVal;
-	}
+        }
 
-	/* zwraca zwraca namiary 2 srzyzowan polaczonych droga, ktora zawiera podany punkt.
-	 * zwraca null, gdy nie istnieje taka droga */
-	public Vector2[] FindRoadContainingPoint(Vector2 point)
-	{
-		foreach(var r in roads)
-		{
-			if(Math.IsPointBelongingToSegment(r.Value.Start, r.Value.End, point))
-				return new Vector2[2] {r.Value.Start, r.Value.End};
-		}
+        return null;
+    }
 
-		return null;
-	}
+    /* zwraca liste skrzyzowan danego regionu */
+    public List<Crossroads> GetCrossroadsListWithRegion(Region region)
+    {
+        List<Crossroads> list = new List<Crossroads>();
 
-	/* znajduje i zwraca namiary skrzyzowan polaczonych przez droge przecinajaca inna droge (bez skrzyzowania)
-	 * start, end - punkty koncowe sprawdzanej drogi
-	 * zwraca null, jesli taka droga nie istnieje */
-	public Vector2[] FindRoadCrossingRoad(Vector2 start, Vector2 end)
-	{
-		//sprawdzanie kazdej srogi
-		foreach(var r in roads)
-		{
-			//sprawdz, czy ktorys z punktow naszej drogi nie przynalezy do drogi r
-			/*if(Math.IsPointBelongingToSegment(start, end, r.Value.Start) || 
-			   Math.IsPointBelongingToSegment(start, end, r.Value.End)) || 
-			   Math.IsPointBelongingToSegment(r.Value.Start, r.Value.End, start) ||
-			   Math.IsPointBelongingToSegment(r.Value.Start, r.Value.End, end))
-			{
-				return new Vector2[] {r.Value.End, r.Value.Start};
-			}
-			//sprawdz, czy odcinki sie przecinaja (zrodlo: http://www.algorytm.org/geometria-obliczeniowa/przecinanie-sie-odcinkow.html )
-			else */if(Math.Det(start, end, r.Value.Start) * Math.Det(start, end, r.Value.End) < 0 &&
-			        Math.Det(r.Value.Start, r.Value.End, start) * Math.Det(r.Value.Start, r.Value.End, end) < 0)
-			{
-				return new Vector2[] {r.Value.End, r.Value.Start};
-			}
-		}
+        foreach(var c in crossroads)
+        {
+            if(c.Value.CityRegion == region)
+                list.Add(c.Value);
+        }
 
-		return null;
-	}
+        return list;
+    }
 
-	/*czy istnieje skrzyzowanie object podanej pozycji */
-	public bool DoCrossroadsExist(Vector2 pos)
-	{
-		return crossroads.ContainsKey(pos);
-	}
+    /* czysci cala mape */
+    public void Clear()
+    {
+        List<Crossroads> crosses = new List<Crossroads>();
 
-	/* usuwa 'sametne' skrzyzowania, ktore nie sa polaczone z zadnymi innymi */
-	public void RemoveLonelyCrossroads()
-	{
-		List<Vector2> crossToRemove = new List<Vector2>();
+        foreach(var c in AllCrossroads)
+            crosses.Add(c.Value);
 
-		foreach(var c in crossroads)
-		{
-			if(c.Value.ConnectedCrossroads.Count == 0)
-				crossToRemove.Add(c.Key);
-		}
-		foreach(var c in crossToRemove)
-			RemoveCrossroads(c);
-	}
+        foreach(var c in crosses)
+            RemoveCrossroads(c.LogicPosition);
 
-	/* czy ulozenie skrzyzowan wzgledem siebie jest dozwolone? (czy postawione sa w jednym z 8 mozliwych kierunkow?) */
-	public bool IsCrossroadPlacedOnPossiblePlace(Vector2 cross1, Vector2 cross2)
-	{
-		float a = (cross1.y - cross2.y) / (cross1.x - cross2.x); //wspolczynnik a porstej miedzy skrzyzowaniami
+        AllCrossroads.Clear();
+    }
 
-		if(float.IsInfinity(a) || a == 0 || a == -1 || a == 1)
-			return true;
 
-		return false;
-	}
+    /* ***********************************************************************************
+     *                   FUNKCJE ZWIAZANE Z ZAPISEM I ODCZYTEM Z PLIKU
+     * *********************************************************************************** */
+    /* kontruktor wymagany dla interfejsu Serializable
+     * info - plik, z ktorego czytamy (?) */
+    public Map(SerializationInfo info, StreamingContext ctxt)
+    {
+        LoadFromFile(info, ctxt);
+    }
 
-	/* zwraca pozycje pierwszego lepszego skrzyzowania (lub null, jesli nie ma skrzyzowan) */
-	public Vector2 GetAnyCrossroads()
-	{
-		Vector2 pos = new Vector2(0, 0);
+    /* laduje dane z pliku 
+     * info - plik, z ktorego pobierane sa dane (?) */
+    public void LoadFromFile(SerializationInfo info, StreamingContext ctxt)
+    {
+        List<Vector2Serializable> crossList = new List<Vector2Serializable>();
+        List<Region> crossRegionList = new List<Region>();
+        List<Vector2Serializable> roadStartList = new List<Vector2Serializable>();
+        List<Vector2Serializable> roadEndList = new List<Vector2Serializable>();
+        
+        //odzczyt z pliku
+        crossList = (List<Vector2Serializable>)info.GetValue("Crossroads", typeof(List<Vector2Serializable>));
+        crossRegionList = (List<Region>)info.GetValue("CrossroadsRegions", typeof(List<Region>));
+        roadStartList = (List<Vector2Serializable>)info.GetValue("RoadStarts", typeof(List<Vector2Serializable>));
+        roadEndList = (List<Vector2Serializable>)info.GetValue("RoadEnds", typeof(List<Vector2Serializable>));
 
-		//zaladam, ze juz jakies skrzyzowanie istnieje.
-		//jesli nie, to niech Bog ma cie w swojej opiece
-		foreach(var c in crossroads)
-			pos = c.Key;
+        //czyszczenie mapy
+        Clear();
 
-		return pos;
-	}
+        //tworzenie obiektow
+        for(int i = 0; i < crossList.Count; ++i)
+        {
+            AddCrossroads(crossList[i].Vect);
+            AllCrossroads[crossList[i].Vect].CityRegion = crossRegionList[i];
+        }
 
-	/* zwraca liste wszystkich pozycji skrzyzowan */
-	public List<Vector2> GetAllCrossroads()
-	{
-		List<Vector2> l = new List<Vector2>();
+        for(int i = 0; i < roadEndList.Count; ++i)
+            AddRoad(roadStartList[i].Vect, roadEndList[i].Vect);
+    }
 
-		foreach(var c in crossroads)
-			l.Add(c.Key);
+    /* dodaje do pliku skladowe klasy 
+     * info - plik, do ktorego zapisujemy (?) */
+    public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
+    {
+        List<Vector2Serializable> crossList = new List<Vector2Serializable>();
+        List<Region> crossRegionList = new List<Region>();
+        List<Vector2Serializable> roadStartList = new List<Vector2Serializable>();
+        List<Vector2Serializable> roadEndList = new List<Vector2Serializable>();
 
-		return l;
-	}
+        foreach(var c in AllCrossroads)
+        {
+            crossList.Add(new Vector2Serializable(c.Value.LogicPosition));
+            crossRegionList.Add(c.Value.CityRegion);
+        }
+        foreach(var r in AllRoads)
+        {
+            roadStartList.Add(new Vector2Serializable(r.Value.Start.LogicPosition));
+            roadEndList.Add(new Vector2Serializable(r.Value.End.LogicPosition));
+        }
 
-	/* zwraca pozycje skrzyzowan polaczonych droga ze skrzyzowaniem o pozycji cross. 
-	 * jesli nie istnieje podane skrzyzowanie, zwracana jest wartosc null */
-	public List<Vector2> FindConnectedCrossroads(Vector2 crossPos)
-	{
-		List<Vector2> crosses = new List<Vector2>();
-		Crossroads cross = crossroads[crossPos];
+        //zapis do pliku
+        info.AddValue("Crossroads", crossList);
+        info.AddValue("CrossroadsRegions", crossRegionList);
+        info.AddValue("RoadStarts", roadStartList);
+        info.AddValue("RoadEnds", roadEndList);
+    }
 
-		if(cross != null)
-			foreach(var c in cross.ConnectedCrossroads)
-				crosses.Add(c.Key);
-		else
-			crosses = null;
+    /* ***********************************************************************************
+     *                                     POZOSTALE
+     * *********************************************************************************** */
 
-		return crosses;
-	}
+    /* zwykly konstruktor */
+    public Map()
+    {
+    }
 
-	/* zwraca dlugosc polaczenia (drogi) miedzy skrzyzowaniami o pozycjach cross1 i cross2 
-	 * zwraca -1, jesli polaczenie miedzy skrzyzowaniami nie istnieje */
-	public float GetRoadLength(Vector2 cross1, Vector2 cross2)
-	{
-		Road road = roads[(cross1 + cross2) / 2];
+    /* ***********************************************************************************
+     *                                 PRYWATNA KLASA MATH
+     *                       Rozszerza funkcjonalnosc klas Math i Mathf
+     * *********************************************************************************** */
+    private class Math
+    {
+        /* oblicza wspolczynnik macierzy 3x3, utworzonej z danych pochodzacych z 3 punktow */
+        public static float Det(Vector2 a, Vector2 b, Vector2 c)
+        {
+            return a.x*b.y + b.x*c.y + c.x*a.y - c.x*b.y - a.x*c.y - b.x*a.y;
+        }
 
-		if(road != null)
-			return road.Length;
-		else
-			return -1;
-	}
+        /* sprawdza, czy punkt C przynalezy do odcinka |AB| */
+        public static bool IsPointBelongingToSegment(Vector2 a, Vector2 b, Vector2 c)
+        {
+            float det = Det(a, b, c);
 
-	/* zmienia strefe miejska skrzyzowania na podana w region
-	 * pos - pozycja skrzyzowania */
-	public void ChangeCrossroadsRegion(Vector2 pos, Region region)
-	{
-		Crossroads cross = crossroads[pos];
+            if(det != 0)
+                return false;
+            else if(Mathf.Min(a.x, b.x) <= c.x && Mathf.Max(a.x, b.x) >= c.x && 
+                    Mathf.Min(a.y, b.y) <= c.y && Mathf.Max(a.y, b.y) >= c.y)
+            {
+                return true;
+            }
 
-		if(cross != null)
-		{
-			cross.CityRegion = region;
-
-			//ustaw region ulic polaczonych z tym skrzyzowaniem na taki sam lub 'posredni'
-			foreach(var c in cross.ConnectedCrossroads)
-				ChangeRoadRegion(cross.Position, c.Value.Position);
-		}
-	}
-
-	/* zmienia region drogi, dostosowujac go do regionow skrzyzowan */
-	private void ChangeRoadRegion(Vector2 cross1, Vector2 cross2)
-	{
-		Road road = roads[(cross1 + cross2) / 2];
-
-		if(crossroads[cross1].CityRegion == crossroads[cross2].CityRegion)
-			road.CityRegion = crossroads[cross1].CityRegion;
-		else
-			road.CityRegion = Region.Neutral;
-	}
-
-	/* zwraca liste pozycji skrzyzowan danego regionu */
-	public List<Vector2> GetCrossroadListWithRegion(Region region)
-	{
-		List<Vector2> list = new List<Vector2>();
-
-		foreach(var c in crossroads)
-		{
-			if(c.Value.CityRegion == region)
-				list.Add(c.Value.Position);
-		}
-
-		return list;
-	}
-
-	/* zwraca region danego skrzyzowania */
-	public Region GetCrossroadsRegion(Vector2 pos)
-	{
-		return crossroads[pos].CityRegion;
-	}
-
-	/* lokalna klasa serwujaca pare uzytecznych metod do obliczen matematycznych */
-	private class Math
-	{
-		/* oblicza wspolczynnik macierzy 3x3, utworzonej z danych pochodzacych z 3 punktow */
-		public static float Det(Vector2 a, Vector2 b, Vector2 c)
-		{
-			return a.x*b.y + b.x*c.y + c.x*a.y - c.x*b.y - a.x*c.y - b.x*a.y;
-		}
-
-		/* sprawdza, czy punkt C przynalezy do odcinka |AB| */
-		public static bool IsPointBelongingToSegment(Vector2 a, Vector2 b, Vector2 c)
-		{
-			float det = Det(a, b, c);
-
-			if(det != 0)
-				return false;
-			else if(Mathf.Min(a.x, b.x) <= c.x && Mathf.Max(a.x, b.x) >= c.x && 
-			        Mathf.Min(a.y, b.y) <= c.y && Mathf.Max(a.y, b.y) >= c.y)
-			{
-				return true;
-			}
-
-			return false;
-		}
-	}
+            return false;
+        }
+    }    
 }
