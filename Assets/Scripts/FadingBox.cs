@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-/* klasa wyswietlajaca podany komunikat i znikajaca po danym czasie*/
+/**<summary>Klasa wyswietlajaca podany komunikat przez okreslony czas</summary>*/
 public class FadingBox : Box
 {
-    //czas, po ktorym kontrolka ma przestac istniec
     private float selfDestructTime;
+    /**<summaryCzas, przez ktory kotrolka bedzie istniec</summary>*/
     public float SelfDestructTime
     {
         set
@@ -19,7 +19,7 @@ public class FadingBox : Box
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
-    /* coroutine. po wskazanym czasie dookonuje samosdestrukcji */
+    /**<summary>Coroutine. Po wskazanym czasie niszczy kontrolke</summary>*/
     protected IEnumerator DestructInTime()
     {
         for(; ; )

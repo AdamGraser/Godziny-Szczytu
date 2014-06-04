@@ -3,52 +3,86 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/**<summary>Klasa reprezentujaca Agenta D</summary>*/
 public class AgentD : MonoBehaviour
 {
     /* sposob jazdy */
-    public float velocity; //predkosc agenta
-    public float sightAngle; //kat widzenia z przodu (odchylenie od kata 0)
-    protected bool brakeOn; //czy hamulec jest aktualni uzywany
-    protected bool isDriving; //czy aktualnei agent jedzie
-    protected HashSet<int> collidingObjects; //ID obiektow uniemozliwiajacyh dalsza jazde
-    public float resetTime; //po ilu sekundach stania w miejscu agent ma sie zresetowac
-    public float resetVelocity; //maksymalna predkosc, przy ktorej agent moze sie zresetowac
-    protected float startResetTime; //czas, w ktorym agent sie zatrzymal
-    protected bool isResetTime; //czy pora sie wylaczyc
+    /** <summary>Predkosc agenta</summary> */
+    public float velocity;
+    /** <summary>Kat widzenia agenta (odchylenie od kata 0)</summary> */
+    public float sightAngle;
+    /** <summary>Czy hamulec jest aktywny (czy aktyalnie agent hamuje)</summary> */
+    protected bool brakeOn;
+    /** <summary>Czy agent aktualnie jest w drodze</summary> */
+    protected bool isDriving;
+    /** <summary>Zbior ID obiektow kolidujacych z agentem</summary> */
+    protected HashSet<int> collidingObjects;
+    /** <summary>Po ilu sekundach od zatrzymania nalezy zresetowac agenta</summary> */
+    public float resetTime;
+    /** <summary>Maksymalna predkosc, przy ktorej uwaza sie, ze agent stoi (i po pewnym czasie trzeba go zresetowac)</summary> */
+    public float resetVelocity;
+    /** <summary>Czas, w ktory agent sie zatrzymal</summary> */
+    protected float startResetTime;
+    /** <summary>Czy pora zresetowac agenta</summary> */
+    protected bool isResetTime;
 
     /* potrzebne przy skrecie */
-    public GameObject frontLeftWheel; //przednie lewe kolo
-    public GameObject frontRightWheel; //przednie prawe kolo
-    public float crossRay; //promien skrzyzowania
-    protected bool isTurning; //czy agent skreca
-    protected bool firstFrameTurning; //czy to klatka, w ktorej zaczal skrecac
-    protected float destAngle; //kat, pod jakim ma byc obrocony agent po zakonczeniu skrecania
-    protected float lastAngle; //kat uzyskany przez agenta w poprzedniej klatce
-    protected int actualCrossID; //ID skrzyzowania, na ktorym aktualnie sie znajdujemy
-    protected Vector3 arcCenterPos; //srodek luku, po ktorym sie przemieszczamy
+    /** <summary>Przednie lewe kolo</summary> */
+    public GameObject frontLeftWheel;
+    /** <summary>Przednie prawe kolo</summary> */
+    public GameObject frontRightWheel;
+    /** <summary>Promien skrzyzowania</summary> */
+    public float crossRay;
+    /** <summary>Czy aktualnei agent skreca</summary> */
+    protected bool isTurning;
+    /** <summary>Czy aktualnie renderowana klatka jest klatka, podczas ktorej agent zaczal skrecac</summary> */
+    protected bool firstFrameTurning;
+    /** <summary>Kat, pod jakim agent powinien wyjsc z zakretu (skrzyzowania)</summary> */
+    protected float destAngle;
+    /** <summary>Kat uzyskany przez agenta w poprzedniej klatce</summary> */
+    protected float lastAngle;
+    /** <summary>ID skrzyzowania, na ktorym aktualnie byl/jest wykonywany zakret</summary> */
+    protected int actualCrossID;
+    /** <summary>Punkt srodkowy luku, po ktorym przemieszcza sie agent</summary> */
+    protected Vector3 arcCenterPos;
 
     /* skladowe dotyczace sciezki, po ktorej jezdzi agent */
-    protected Vector2 destination; //lokalny punkt docelowy
-    protected Gps gps; //gieps
-    protected List<Vector2> path; //sciezka wyznaczona przez gps
+    /** <summary>Lokalny punkt (skrzyzowanie) docelowe</summary> */
+    protected Vector2 destination;
+    /** <summary>GPS</summary> */
+    protected Gps gps;
+    /** <summary>Sciezka wyznaczona przez GPS (przechowywane sa pozycje skrzyzowan)</summary> */
+    protected List<Vector2> path;
 
     /* 'zycie agenta' */
-    public Vector2 HomePlace { get; set; } //miejsce zamieszkania
-    public Vector2 WorkPlace { get; set; } //miejsce pracy
-    public float WorkMoveOut { get; set; } //czas wyjazdu z pracy
-    public float HomeMoveOut { get; set; } //czas wujazdu z domu
-    protected Vector3 startPosition; //miejsce, w ktorym sie pojawi agent, gdy bedzie wyruszal w swiat
-    protected float startAngle; //kat, pod ktorym zostanie ustawiony agent na poczatku podrozy
-    protected Clock clock; //zegar, wedlug ktorego agent bedzie wyjezdzal z domu lub pracy
+    /** <summary>Miejsce (skrzyzowanie) traktowane jako miejsce, w ktorym agent mieszka</summary> */
+    public Vector2 HomePlace { get; set; }
+    /** <summary>Miejsce (skrzyzowanie) traktowane jako miejsce, w ktorem agent pracuje</summary> */
+    public Vector2 WorkPlace { get; set; }
+    /** <summary>Czas wyjazdu z pracy</summary> */
+    public float WorkMoveOut { get; set; }
+    /** <summary>Czas wyjazdu z domu</summary> */
+    public float HomeMoveOut { get; set; }
+    /** <summary>Pozycja, na ktorej pojawi sie agent podczas wyjazdu</summary> */
+    protected Vector3 startPosition;
+    /** <summary>Kat, pod jakim bedzie ustawiony na startowej pozycji</summary> */
+    protected float startAngle;
+    /** <summary>Zegar, wedlug ktorego agent bedzie wyjezdzal do domu lub pracy</summary> */
+    protected Clock clock;
 
     /* inne */
-    public float length; //dlugosc samochodu
-    public GameObject model; //fizyczny model agenta (wylaczany, gdy agent jest nieaktywny)
+    /** <summary>Odleglosc miedzy osiami pojazdu</summary> */
+    public float length;
+    /** <summary>Model pojazdu</summary> */
+    public GameObject model;
+    /** <summary>Prefab eksplozji (BOOM!)</summary> */
+    public GameObject explosionPrefab;
 
     /* ***********************************************************************************
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
+    /** <summary>Funkcja przygotowujaca Agenta D do zabawy. Wywolywana na poczatku istnienia obiektu, przed funkcja Start.</summary> */
     protected virtual void Awake()
     {
         brakeOn = false;
@@ -72,6 +106,7 @@ public class AgentD : MonoBehaviour
         startAngle = 0;
     }
 
+    /** <summary>Funkcja przygotowujaca Agenta D. Wywolywana na poczatku istnienia obiektu, po funkcji Awake.</summary> */
     protected virtual void Start()
     {
         gps.LoadMap((Map)GameObject.FindWithTag("Map").GetComponent("Map"));
@@ -83,9 +118,14 @@ public class AgentD : MonoBehaviour
         isDriving = false;
 
         //schowaj sie pod mape
-        Finish();
+        actualCrossID = 0;
+        isDriving = false;
+        transform.Translate(0, -3, 0);
+        rigidbody.isKinematic = true;
+        model.SetActive(false);
     }
 
+    /** <summary>Funkcja wywolywana podczas kazdej klatki.</summary> */
     protected void Update()
     {
         if(isDriving)
@@ -100,6 +140,8 @@ public class AgentD : MonoBehaviour
         }
     }
 
+    /** <summary>Funkcja wywolywana przy odpaleniu triggera (tego obiektu lub obiektu, z ktorym Agent sie spotkal)</summary>
+     *  <param name="other">Obiekt, z ktorym spotkal sie nasz Agent.</param> */
     protected virtual void OnTriggerEnter(Collider other)
     {
         // jesli wjechales na skrzyzowanie, to oblicz, jak nalezy skrecic
@@ -127,6 +169,8 @@ public class AgentD : MonoBehaviour
         }
     }
 
+    /** <summary>Funkcja wywolywana w momencie opuszczenia triggera przez inny trigger lub colider.</summary>
+     *  <param name="other">Obiekt, z ktorym spotkal sie nasz Agent, a teraz go opuscil.</param> */
     protected void OnTriggerExit(Collider other)
     {
         RemoveFromCollidingObjects(other.GetInstanceID());
@@ -136,8 +180,8 @@ public class AgentD : MonoBehaviour
      *                        FUNKCJE POTRZEBNE PRZY SKRECANIU
      * *********************************************************************************** */
 
-    /* wylicza wszystkie potrzebne skladowe, wymagane do wykonania prawidlowego skretu  na skrzyzowaniu
-     * crossPos - pozycja skrzyzowania, na ktorym wykonywany bedzie skret */
+    /**<summary>Oblicza wszystkie potrzebne skladowe, wymagane do wykonania prawidlowego skretu na skrzyzowaniu.</summary>
+     * <param name="crossPos">pozycja skrzyzowania, na ktorym wykonywany bedzie skret</param> */
     protected void CalculateTurningMembers(Vector3 crossPos)
     {
         Vector3 startPos; //pozycja startowa
@@ -192,8 +236,9 @@ public class AgentD : MonoBehaviour
     }
 
 
-    /* zwraca kat (wzgledem osi y), pod jakim musialby byc ustawiony obiekt, 
-     * by patrzec w punktu from na punkt at */
+    /**<summary>Zwraca kat (wzgledem osi y), pod jakim musialby byc ustawiony obiekt, by patrzec w punktu from na punkt at</summary>
+     * <param name="from">Punkt, z ktorego agent ma patrzec na punkt at</param>
+     * <param name="at">Punkt, na ktory ma patrzec agent</param>*/
     protected float GetRotationLookingAt(Vector3 from, Vector3 at)
     {
         Vector3 pos = transform.position; //aktualna pozycja
@@ -209,13 +254,13 @@ public class AgentD : MonoBehaviour
         
         return angleToReturn;
     }
-    
-    /* zwraca punkt, wokol ktorego musi sie obracac agent, by skrecic po wyznaczonym luku.
-     * startPos - punkt startowy luku
-     * startAngle - kat (orientacja) startowy (w stopniach)
-     * endPos - punkt koncowy luku
-     * endAngle - kat koncowy (w stopniach) 
-     * jesli z podanych danych bedzie wynikach, ze agent nie bedzie skrecal, zostanie rzucony wyjatek ArgumentException*/
+
+    /**<summary>Zwraca punkt, wokol ktorego musi sie obracac agent, by skrecic po wyznaczonym luku</summary>
+     * <param name="startPos">Punkt startowy luku</param>
+     * <param name="startAngle">Kat (orientacja) startowy (w stopniach)</param>
+     * <param name="endPos">Punkt koncowy luku</param>
+     * <param name="endAngle">endAngle - kat koncowy (w stopniach)</param>
+     * <exception cref="ArgumentException">Jest rzucany, jesli agent ma jechac po prostej (a nie po luku)</exception>*/
     protected Vector3 GetRotationPoint(Vector3 startPos, float startAngle, Vector3 endPos, float endAngle)
     {
         //wspolczynniki prostych przechodzacych przez punkt A i B
@@ -273,7 +318,7 @@ public class AgentD : MonoBehaviour
         return arcCenter;
     }
     
-    /* skrec. jesli wykonano zadany kat, przestan skrecac */
+    /**<summary>Wykonuje skret. Jezeli Agent osiagnal kat docelowy, przestaje skrecac</summary>*/
     protected void Turn()
     {
         float actualAngle = transform.eulerAngles.y;
@@ -319,7 +364,7 @@ public class AgentD : MonoBehaviour
      *                 FUNKCJE ZWIAZANE Z 'ZYCIEM CODZIENNYM' (COROUTINES)
      * *********************************************************************************** */
     
-    /* coroutine. agent rozpoczyna podroz z domu do pracy */
+    /**<summary>Coroutine. Sprawdza, czy mozna wyslac agenta do pracy. Jesli tak, to to robi. W przeciwnym wypadku czeka pol sekundy.</summary>*/
     protected virtual IEnumerator GoWork()
     {
         for(; ; )
@@ -342,6 +387,7 @@ public class AgentD : MonoBehaviour
                     transform.position = startPosition;
                     transform.rotation = Quaternion.Euler(0, startAngle, 0);
                     model.SetActive(true);
+                    Explode();
                 }                
             }
 
@@ -352,7 +398,7 @@ public class AgentD : MonoBehaviour
         }
     }
 
-    /* coroutine. rozpoczyna podroz z pracy do domu */
+    /**<summary>Coroutine. Sprawdza, czy mozna wyslac agenta do domu. Jesli tak, to to robi. W przeciwnym wypadku czeka pol sekundy.</summary>*/
     protected virtual IEnumerator GoHome()
     {
         for(; ; )
@@ -375,6 +421,7 @@ public class AgentD : MonoBehaviour
                     transform.position = startPosition;
                     transform.rotation = Quaternion.Euler(0, startAngle, 0);
                     model.SetActive(true);
+                    Explode();
                 }
             }
 
@@ -389,9 +436,9 @@ public class AgentD : MonoBehaviour
      *          FUNKCJE ZWIAZANE Z ROZPOCZECIEM, KONTYNUACJA I ZAKONCZENIEM JAZDY
      * *********************************************************************************** */
 
-    /* oblicza poczatkowa pozycje i kat. wyznacza trase do celu 
-     * start - startowe skrzyzowanie 
-     * end - skrzyzowanie docelowe */
+    /**<summary>Oblicza poczatkowa pozycje i kat dla agenta. Wyznacza trase do celu.</summary>
+     * <param name="start">startowe skrzyzowanie</param>
+     * <param name="end">skrzyzowanie docelowe</param> */
     protected virtual void CalculateStartMembers(Vector2 start, Vector2 end)
     {
         rigidbody.isKinematic = false;
@@ -415,8 +462,8 @@ public class AgentD : MonoBehaviour
         NextDestination();
     }
 
-    /* ustawia skaldowa destination na kolejny punkt docelowy.
-     * zwraca true, jesli taki punkt [docelowy] istnieje; w przeciwnym przepadku zwraca false */
+    /**<summary>Ustawia skladowa destination na kolejny punkt docelowy.</summary>
+     * <returns>Zwraca true, jesli taki punkt [docelowy] istnieje; w przeciwnym przepadku zwraca false</returns>*/
     protected virtual bool NextDestination()
     {
         bool returnVal = path.Count == 0 ? false : true;
@@ -430,10 +477,10 @@ public class AgentD : MonoBehaviour
         return returnVal;
     }
     
-    /* konczy podroz. znika pod ziemie i tam czeka na godzine, w ktorej wyjedzie */
+    /**<summary>Konczy podrozagenta. Zakpuje go pod ziemie, gdzie czeka na godzine, by znow sie pokazac na drogach</summary>*/
     protected virtual void Finish()
     {
-        Debug.Log("BASE Finish!");
+        Explode();
         //Debug.Log("Agent: Dojechalem do: " + destination + ". Bez odbioru.");
         actualCrossID = 0;
         isDriving = false;
@@ -445,7 +492,8 @@ public class AgentD : MonoBehaviour
         path.Clear();
     }
 
-    /* sprawdza, czy dane miejsce jest puste (jesli chodzi o agentow) */
+    /**<summary>Sprawdza, czy podane miejsce jest puste (czy nie znajduje sie tam zaden agent)</summary>
+     * <returns>Zwraca true, jesli miejsce jest puste; false - w przeciwnym wypadku</returns>*/
     protected bool IsPlaceEmpty(Vector3 pos)
     {
         Collider[] colliders = Physics.OverlapSphere(pos, length / 2f);
@@ -461,8 +509,7 @@ public class AgentD : MonoBehaviour
         return true;
     }
 
-    /* Resetuje agenta, gdy nadejdzie taka potrzeba
-     * Resetuje (ustawia na pozycje startowa), gdy agent stal bezczynnie przez resetTime sekund */
+    /**<summary>Resetuje agenta, gdy stoi on zbyt dlugo (resetTime sekund) w jednym miejscu.</summary>*/
     protected void ResetIfNeeded()
     {
         if(rigidbody.velocity.magnitude <= resetVelocity)
@@ -481,7 +528,7 @@ public class AgentD : MonoBehaviour
             startResetTime = 0;
     }
 
-    /* traktuje jakby agent ukonczyl jazde. wylacza agenta pewien czas po wywolaniu funkcji */
+    /**<summary>Coroutine. Traktuje jakby agent ukonczyl jazde. Wylacza agenta pewien czas po wywolaniu funkcji</summary>*/
     protected IEnumerator FinishInTime()
     {
         for(; ; )
@@ -508,7 +555,9 @@ public class AgentD : MonoBehaviour
      *                             FUNKCJE ZWIAZANE Z KOLIZJA
      * *********************************************************************************** */
 
-    /* sprawdza, czy podany obiekt znajduje sie przed naszym agentem */
+    /**<summary>Sprawdza, czy podany obiekt znajduje sie przed naszym agentem (czy agent go widzi)</summary>
+     * <param name="obj">Transform testowanego obiektu</param>
+     * <returns>Zwraca true, jesli testowany obiekt znajduje sie przed naszym agentem</returns>*/
     protected bool IsObjectInFrontOf(Transform obj)
     {
         bool returnVal = false;
@@ -525,20 +574,26 @@ public class AgentD : MonoBehaviour
         return returnVal;
     }
 
-    /* dodaje ID obiektu do listy obiektow kolidujacych z agentem. Zatrzymuje agenta */
+    /**<summary>Dodaje ID obiektu do listy obiektow kolidujacych z agentem. Zatrzymuje agenta</summary>*/
     protected void AddToCollidingObjects(int id)
     {
         collidingObjects.Add(id);
         brakeOn = true;
     }
 
-    /* usuwa z listy obiektow kolidujacych obiekt o podanym ID. jesli list jest pusta, wprawia agenta w ruch */
+    /**<summary>Usuwa z listy obiektow kolidujacych obiekt o podanym ID. Jesli list jest pusta, wprawia agenta w ruch</summary>*/
     protected void RemoveFromCollidingObjects(int id)
     {
         collidingObjects.Remove(id);
 
         if(collidingObjects.Count == 0)
             brakeOn = false;
+    }
+
+    /**<summary>Tworzy obiekt eksplozji. BOOM!</summary>*/
+    protected void Explode()
+    {
+        Instantiate(explosionPrefab, transform.position, new Quaternion());
     }
 }
 

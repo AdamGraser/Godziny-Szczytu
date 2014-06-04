@@ -1,10 +1,11 @@
-﻿using UnityEngine;
-using System.Collections;
-
-/* enum sluzacy do okreslania strefy miasta */
+﻿
+/**<summary>Okresla typ strefy miejskiej</summary>*/
 public enum Region
 {
-	Neutral,
-	Residential,
-	Industrial
+    /**<summary>Strefa neutralna</summary>*/
+    Neutral,
+    /**<summary>Strefa mieszkalna</summary>*/
+    Residential,
+    /**<summary>Strefa przemyslowa</summary>*/
+    Industrial
 }

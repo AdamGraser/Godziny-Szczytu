@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-/* klasa wykorzystywana do zapisu i odczytu z pliku danych nt. mapy */
+/**<summary>Klasa wykorzystywana do zapisu i odczytu z pliku danych nt. mapy</summary>*/
 [Serializable()]
 public class MapFileContent : ISerializable
 {
-    public List<Vector2Serializable> CrossroadsPositionList { get; set; } //pozycje skrzyzowan
-    public List<Region> CrossroadRegionList { get; set; } //regiony skrzyzowan
-    public List<Vector2Serializable> RoadStartList { get; set; } //poczatki drog
-    public List<Vector2Serializable> RoadEndList { get; set; } //konce drog
+    /**<summary>Pozycje kolejny skrzyzowan</summary>*/
+    public List<Vector2Serializable> CrossroadsPositionList { get; set; }
+    /**<summary>Regiony (strefy miejskie), pod ktore podlegaja kolejne skrzyzowania</summary>*/
+    public List<Region> CrossroadRegionList { get; set; }
+    /**<summary>Pozycje skrzyzowan, ktore sa poczatkami kolejnych drog</summary>*/
+    public List<Vector2Serializable> RoadStartList { get; set; }
+    /**<summary>Pozycje skrzyzowan, ktore sa koncami kolejnych drog</summary>*/
+    public List<Vector2Serializable> RoadEndList { get; set; }
 
-    /* konstruktor na potrzeby Serializable - stosowac podczas zapisu */
+    /**<summary>Konstruktor na potrzeby Serializable - stosowac podczas zapisu</summary>*/
     public MapFileContent()
     {
         CrossroadsPositionList = new List<Vector2Serializable>();
@@ -20,8 +24,8 @@ public class MapFileContent : ISerializable
         RoadEndList = new List<Vector2Serializable>();
     }
 
-    /* kontruktor pobierajacy agenta
-     * map - mapa, z ktorej pobrac informacje */
+    /**<summary>Kontruktor</summary>
+     * <param name="map">Mapa, z ktorej wyciaga informacje</param> */
     public MapFileContent(Map map)
     {
         CrossroadsPositionList = new List<Vector2Serializable>();
@@ -42,8 +46,9 @@ public class MapFileContent : ISerializable
         }
     }
 
-    /* kontruktor wymagany dla interfejsu Serializable
-     * info - plik, z ktorego czytamy (?) */
+    /**<summary>Kontruktor</summary>
+     * <param name="info">Plik, z ktorego czytamy dane (?)</param>
+     * <param name="ctxt">Kontekst (?)</param>*/
     public MapFileContent(SerializationInfo info, StreamingContext ctxt)
     {
         CrossroadsPositionList = (List<Vector2Serializable>)info.GetValue("CrossroadsPositionList", typeof(List<Vector2Serializable>));
@@ -52,8 +57,9 @@ public class MapFileContent : ISerializable
         RoadEndList = (List<Vector2Serializable>)info.GetValue("RoadEndList", typeof(List<Vector2Serializable>));
     }
 
-    /* dodaje do pliku skladowe klasy 
-     * info - plik, do ktorego zapisujemy (?) */
+    /**<summary>Zapisuje dane do pliku wyznaczonego przez info</summary>
+     * <param name="info">Plik, do ktorego zapisujemy dane (?)</param>
+     * <param name="ctxt">Kontekst (?)</param>*/
     public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
     {
         info.AddValue("CrossroadsPositionList", CrossroadsPositionList);

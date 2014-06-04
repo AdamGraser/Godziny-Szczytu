@@ -1,16 +1,22 @@
 ﻿using UnityEngine;
 
-/* reprezentuje swiatla na skrzyzowaniu */
+/**<summary>Klasa reprezentujaca sygnalizacje swietlna na skrzyzowaniu</summary>*/
 public class TrafficLight : MonoBehaviour
 {
-    public GameObject redLight; //czerwone swiatlo
-    public GameObject greenLight; //zielone swiatlo
-    public GameObject wall; //sciana, dzialajaca jak szlaban
+    /**<summary>Czerwone swiatlo</summary>*/
+    public GameObject redLight;
+    /**<summary>Zielone swiatlo</summary>*/
+    public GameObject greenLight;
+    /**<summary>Sciana-szlaban</summary>*/
+    public GameObject wall;
 
-    public float wallShift; //obnizenie muru, gdy zapala sie zielone swiatlo
-    private float wallYPos; //oryginalna pozycja y sciany
+    /**<summary>Wartosc obnizenia sciany, gdy zapala sie zielone swiatlo</summary>*/
+    public float wallShift;
+    /**<summary>Poczatkowa pozycja sciany</summary>*/
+    private float wallYPos; 
 
-    private Crossroads sourceCrossroads; //skrzyzowanie, z ktorego prowadzi droga, na ktorej umieszczona jest sciana
+    private Crossroads sourceCrossroads;
+    /**<summary>Skrzyzowanie, z ktorego prowadzi droga (na ktorej umieszczona jest sciana)</summary>*/
     public Crossroads SourceCrossroads
     {
         set
@@ -26,7 +32,9 @@ public class TrafficLight : MonoBehaviour
         }
     }
 
-    private Crossroads owner; //skrzyzowanie-wlasciciel danej sciany
+   
+    private Crossroads owner;
+    /**<summary>Skrzyzowanie-wlasciciel tej sygnalizacji</summary>*/
     public Crossroads Owner
     {
         set
@@ -47,6 +55,7 @@ public class TrafficLight : MonoBehaviour
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
+    /** <summary>Funkcja przygotowujaca sygnalizacje do zabawy. Wywolywana na poczatku istnienia obiektu</summary> */
     void Awake()
     {
         wallYPos = wall.transform.position.y;
@@ -56,7 +65,7 @@ public class TrafficLight : MonoBehaviour
      *                                   FUNKCJE PUBLICZNE
      * *********************************************************************************** */
 
-    /* blokuje przejazd */
+    /**<summary>Blokuje przejazd</summary>*/
     public void ActivateRedLight()
     {
         redLight.SetActive(true);
@@ -64,7 +73,7 @@ public class TrafficLight : MonoBehaviour
         wall.rigidbody.MovePosition(new Vector3(wall.transform.position.x, wallYPos, wall.transform.position.z));
     }
 
-    /* odblokowuje przejazd */
+    /**<summary>Odblokowuje przejazd</summary>*/
     public void ActivateGreenLight()
     {
         redLight.SetActive(false);

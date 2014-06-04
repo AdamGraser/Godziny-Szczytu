@@ -4,60 +4,91 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-/* Glowny kontroler. Zawiera rozne tryby dzialania. Od nich zalezy, co bedzie robic klikniecie myszy i inne... */
+/**<summary>Kontroler obslugujacy (nasluchujacy) wszystkie menu i wykonujacy zadane przez przyciski akcje</summary>*/
 public class Controller : MonoBehaviour 
 {
     /* zdarzenia */
     private delegate void ActionDelegate();
-    private ActionDelegate activeAction; //delegat przechowujacy ostatnia akcje, ktora zostala zgloszona
-    private bool isActionContinous; //czy ostatnia akcja ma sie wykonywac caly czas (akcja ciagla) czy tylko raz
+    /**<summary>Aktywna akcja, ktora ma byc wykonywana</summary>*/
+    private ActionDelegate activeAction;
+    /**<summary>Czy akcja ma byc wykonywana w ciagle, czy tylko raz</summary>*/
+    private bool isActionContinous;
 
     /* obsluga GUI */
-    public GUI gui; //klasa zarzadzajaca GUI
+    /**<summary>Obiekt zarzadzajacy GUI</summary>*/
+    public GUI gui;
 
     /* obsluga road menu */
-    public GameObject gridPrefab; //grid wyznaczajacy miejsca, na ktorych mozna umieszczac drogi
+    /**<summary>Prefab grida (siatki pokazujacej punkty, na ktorych mozna klasc skrzyzowania)</summary>*/
+    public GameObject gridPrefab;
+    /**<summary>Obiekt grida</summary>*/
     private GameObject grid;
-    public GameObject possibleRoadDirectionsPrefab; //siatka pokazujaca mozliwe punkty, w ktorych mozna postawic droge
+    /**<summary>Prefab gwiazdy pokazujacej pozycje, na ktorych nowopolozone skrzyzowanie polaczy sie ze wczesniejszym</summary>*/
+    public GameObject possibleRoadDirectionsPrefab;
+    /**<summary>Obiekt gwiazdy</summary>*/
     private GameObject possibleRoadDirections;
-    private bool isCrossroadsSelected; //czy zostalo juz zaznaczone ktores ze skrzyzowan
-    private Crossroads selectedCrossroads; //zaznaczone skrzyzowanie
+    /**<summary>Czy aktualnie jest zaznaczone skrzyzowanie</summary>*/
+    private bool isCrossroadsSelected;
+    /**<summary>Aktualnie zaznaczone skrzyzowanie</summary>*/
+    private Crossroads selectedCrossroads;
 
     /* obsluga region menu */
-    public GameObject neutralRegionPrefab; //prefab symbolu neutralnej strefy
-    public GameObject residentialRegionPrefab; //prefab symbolu strefy mieszkalnej
-    public GameObject industrialRegionPrefab; //prefab symbolu strefy przemyslowej
-    private Dictionary<Crossroads, GameObject> regionSigns; //lista przechowujaca wygenerowane symbole stref
+    /**<summary>Prefab znaku strefy neutralnej</summary>*/
+    public GameObject neutralRegionPrefab;
+    /**<summary>Prefab znaku strefy mieszkalnej</summary>*/
+    public GameObject residentialRegionPrefab;
+    /**<summary>Prefab znaku strefy przemyslowej</summary>*/
+    public GameObject industrialRegionPrefab;
+    /**<summary>Wygenerowane znaki stref</summary>*/
+    private Dictionary<Crossroads, GameObject> regionSigns;
 
     /*obsluga agent menu */
-    public GameObject agentDPrefab; //prefab agenta D
-    public GameObject agentSPrefab; //prefab agenta S
-    private AgentS agentS; //utworzony agent S
-    private GameObject agentSHomeSign; //znak pokazujacy, gdzie mieszka agent S
-    private GameObject agentSWorkSign; //znak pokazujacy, gdzie pracuje agnet S
-    private bool isHomeChosen; //czy miejsce zamieszkanai dla agenta S juz zostalo wybrane
+    /**<summary>Prefab Agenta D</summary>*/
+    public GameObject agentDPrefab;
+    /**<summary>Prefab Agenta S</summary>*/
+    public GameObject agentSPrefab;
+    /**<summary>Obiekt Agenta S</summary>*/
+    private AgentS agentS;
+    /**<summary>Obiekt symbolu strefy mieszkalnej dla Agenta S</summary>*/
+    private GameObject agentSHomeSign;
+    /**<summary>Obiekt symbolu strefy przemyslowej dla Agenta S</summary>*/
+    private GameObject agentSWorkSign;
+    /**<summary>Czy miejsce zamieszkania dla Agenta S zostalo wybrane</summary>*/
+    private bool isHomeChosen;
 
     /* obsluga timeMenu */
+    /**<summary>Predkosc symulacji</summary>*/
     private float simulationSpeed;
 
     /* GUI - pobieranie danych */
-    private bool activateInputForm; //czy aktywowac forumlarz pobierania danych
-    private string input; //wartosc, ktora wpisal uzytkownik
-    private string textBoxText; //tekst wyswietlany uzytkownikowi
-    private string buttonText; //tekst wyswietlany na przycisku
-    private Rect textBoxRect; //rozmiar i pozycja textboxa
-    private Rect inputBoxRect; //rozmiar i pozycja inputboxa
-    private Rect buttonRect; //rozmiar i pozycja buttona
-    public float widgetDistance; //rozmiar miedzy kontrolkami
-    private ActionDelegate methodToInvoke; //metoda, ktora ma zostac wywolana po wypelnieniu formularza
+    /**<summary>Czy formularz pobierania danych jest aktywny</summary>*/
+    private bool activateInputForm;
+    /**<summary>Wartosc pobrana od uzytkownika</summary>*/
+    private string input;
+    /**<summary>Tekst wyswietlany uzytkownikowi</summary>*/
+    private string textBoxText;
+    /**<summary>Przycisk zatwierdzajacy</summary>*/
+    private string buttonText;
+    /**<summary>Rozmiar i pozycja wiadomosci</summary>*/
+    private Rect textBoxRect;
+    /**<summary>Rozmiar i pozycja wiadomosci (tesktu wyswietlanego uzytkownikowi)</summary>*/
+    private Rect inputBoxRect;
+    /**<summary>Rozmiar i pozycja przycisku zatwierdzajacego</summary>*/
+    private Rect buttonRect;
+    /**<summary>Odstep miedzy kontrolkami</summary>*/
+    public float widgetDistance;
+    /**<summary>Metoda, ktora ma zostac wywolana po zatwierdzeniu formularza</summary>*/
+    private ActionDelegate methodToInvoke;
 
     /* pozostale */
-    public Map map; //mapa
+    /**<summary>Mapa</summary>*/
+    public Map map;
 
     /* ***********************************************************************************
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
+    /** <summary>Funkcja przygotowujaca kontroler do zabawy. Wywolywana na poczatku istnienia obiektu, przed funkcja Start.</summary> */
     void Awake()
     {
         activeAction = null;
@@ -85,6 +116,7 @@ public class Controller : MonoBehaviour
         buttonText = "";
     }
 
+    /** <summary>Funkcja przygotowujaca Agenta D. Wywolywana na poczatku istnienia obiektu, po funkcji Awake.</summary> */
     void Start()
     {
         /* agent menu */
@@ -97,12 +129,14 @@ public class Controller : MonoBehaviour
         simulationSpeed = Time.timeScale;
     }
 
+    /** <summary>Funkcja wywolywana podczas kazdej klatki.</summary> */
     void Update()
     {
         if(activeAction != null && isActionContinous)
             activeAction();
     }
 
+    /** <summary>Funkcja rysujaca formularz pobierania danych od uzytkownika.</summary> */
     void OnGUI()
     {
         if(activateInputForm)
@@ -117,13 +151,13 @@ public class Controller : MonoBehaviour
      *        OBSLUGA APPLICATION MENU
      * **************************************** */
 
-    /* zamyka aplikacje */
+    /** <summary>Zanyka aplikacje</summary> */
     public void Exit()
     {
         Application.Quit();
     }
 
-    /* towrzy formularz pozwalajacy na podanie nazwy pliku, do ktorego ma zostac zapisany aktualny stan symulacji */
+    /**<summary>Tworzy formularz pozwalajacy na podanie nazwy pliku, do ktorego ma zostac zapisany aktualny stan symulacji</summary> */
     public void ActivateSaveForm()
     {
         SetActiveAction(ActivateSaveForm);
@@ -136,7 +170,7 @@ public class Controller : MonoBehaviour
         activateInputForm = true;
     }
 
-    /* towrzy formularz pozwalajacy na podanie nazwy pliku, z ktorego ma zostac zaladowany stan symulacji */
+    /**<summary>Tworzy formularz pozwalajacy na podanie nazwy pliku, z ktorego ma zostac zaladowana symulacja</summary> */
     public void ActivateLoadForm()
     {
         SetActiveAction(ActivateLoadForm);
@@ -153,7 +187,7 @@ public class Controller : MonoBehaviour
      *          OBSLUGA GENERAL MENU
      * **************************************** */
 
-    /* wylacza wszystkie podmenu i aktywuje podmenu do zarzadzania drogami */
+    /**<summary>Aktywuje podmenu do zarzadzania drogami</summary> */
     public void ActivateRoadSubmenu()
     {
         SetActiveAction(ActivateRoadSubmenu);
@@ -164,7 +198,7 @@ public class Controller : MonoBehaviour
         grid.SetActive(true); //pokaz grid
     }
 
-    /* wylacza wszystkie podmenu i aktywuje podmenu do zarzadzania regionami */
+    /**<summary>Aktywuje podmenu do zarzadzania strefami miejskimi</summary> */
     public void ActivateRegionSubmenu()
     {
         SetActiveAction(ActivateRegionSubmenu);
@@ -175,7 +209,7 @@ public class Controller : MonoBehaviour
         CreateRegionSigns(); //wygeneruj symbole stref
     }
 
-    /* wylacza wszystkie podmenu i aktywuje podmenu do zarzadzania agentami */
+    /**<summary>Aktywuje podmenu do zarzadzania agentami</summary> */
     public void ActivateAgentSubmenu()
     {
         SetActiveAction(ActivateAgentSubmenu);
@@ -188,7 +222,7 @@ public class Controller : MonoBehaviour
      *           OBSLUGA ROAD MENU
      * **************************************** */
 
-    /* dodaje we wskazane miejsce skrzyzowanie i - jesli wczesniej zaznaczono inne skrzyzowanie - laczy je z nim */
+    /**<summary>Dodaje we wskazane miejsce skrzyzowanie i - jesli wczesniej zaznaczono inne skrzyzowanie - laczy je z nim</summary> */
     public void CreateRoad()
     {
         RaycastHit hit; // miejsce, w ktorym kliknal uzytkownik;
@@ -230,7 +264,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* usuwa wskazane skrzyzowanie (wraz z polaczonymi z nim drogami) lub droge */
+    /**<summary>Usuwa wskazane skrzyzowanie (wraz z polaczonymi z nim drogami) lub droge</summary> */
     public void RemoveRoad()
     {
         RaycastHit hit;
@@ -278,7 +312,7 @@ public class Controller : MonoBehaviour
      *           OBSLUGA REGION MENU
      * **************************************** */
 
-    /* ustawia region kliknietego skrzyzowania na neutralny */
+    /**<summary>ustawia region kliknietego skrzyzowania na neutralny </summary> */
     public void SetNeutralRegion()
     {
         RaycastHit hit;
@@ -307,7 +341,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* ustawia region kliknietego skrzyzowania na mieszkalny */
+    /**<summary>ustawia region kliknietego skrzyzowania na mieszkalny </summary> */
     public void SetResidentialRegion()
     {
         RaycastHit hit;
@@ -336,7 +370,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* ustawia region kliknietego skrzyzowania na przemyslowy */
+    /**<summary>ustawia region kliknietego skrzyzowania na przemyslowy </summary> */
     public void SetIndustrialRegion()
     {
         RaycastHit hit;
@@ -368,8 +402,8 @@ public class Controller : MonoBehaviour
     /* ****************************************
      *           OBSLUGA AGENT MENU
      * **************************************** */
-    
-    /* towrzy formularz umozliwiajace generowanie agentow D */
+
+    /**<summary>Tworzy formularz pozwalajacy na podanie liczby Agentow D do stworzenia</summary> */
     public void ActivateAgentDCreateForm()
     {
         SetActiveAction(ActivateAgentDCreateForm);
@@ -382,7 +416,7 @@ public class Controller : MonoBehaviour
         activateInputForm = true;
     }
 
-    /* towrzy formularz umozliwiajace usuwanie agentow D */
+    /**<summary>Tworzy formularz pozwalajacy na podanie liczby Agentow D do usuniecia</summary> */
     public void ActivateAgentDRemoveForm()
     {
         SetActiveAction(ActivateAgentDRemoveForm);
@@ -395,8 +429,7 @@ public class Controller : MonoBehaviour
         activateInputForm = true;
     }
 
-    /* kaze wybrac uzytkownikowi miejsce zamieszakania i pracy dla agenta S.
-     * nastepnie go tworzy */
+    /**<summary>Kaze wybrac uzytkownikowi miejsce zamieszakania i pracy dla agenta S i nastepnie go tworzy</summary> */
     public void CreateAgentS()
     {
         RaycastHit hit;
@@ -443,7 +476,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* usuwa agenta S */
+    /**<summary>Usuwa Agenta S</summary>*/
     public void RemoveAgentS()
     {
         SetActiveAction(RemoveAgentS);
@@ -461,7 +494,7 @@ public class Controller : MonoBehaviour
      *           OBSLUGA TIME MENU
      * **************************************** */
 
-    /* spowalnia dwukrotnie symulacje */
+    /**<summary>Spowalnia dwukrotnie symulacje</summary>*/
     public void MakeSimulationSlower()
     {
         SetActiveAction(MakeSimulationSlower);
@@ -473,7 +506,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* przyspiesza dwukrotnie symulacje */
+    /**<summary>Przyspiesza dwukrotnie symulacje</summary>*/
     public void MakeSimulationFaster()
     {
         SetActiveAction(MakeSimulationFaster);
@@ -485,7 +518,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* pauzuje lub wznawia symulacje */
+    /**<summary>Pauzuje i wznawia symulacje</summary>*/
     public void PauseResumeSimulation()
     {
         SetActiveAction(PauseResumeSimulation);
@@ -503,7 +536,7 @@ public class Controller : MonoBehaviour
     /* ****************************************
      *        OBSLUGA APPLICATION MENU
      * **************************************** */
-    /* zapisuje aktualny stan symulacji (siec drog, zycie codzienne agentow i smartGPS) od wskazanego pliku */
+    /**<summary>Zapisuje aktualny stan symulacji (siec drog, zycie codzienne agentow i smartGPS) od wskazanego pliku</summary> */
     private void SaveToFile()
     {
         string fileName = input;
@@ -553,7 +586,7 @@ public class Controller : MonoBehaviour
         
     }
 
-    /* laduje zapisany stan symulacji z pliku podanego przez uzytkownika */
+    /**<summary>Laduje zapisany stan symulacji z pliku podanego przez uzytkownika</summary>*/
     private void LoadFromFile()
     {
         string fileName = input;
@@ -606,7 +639,8 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* generuje mape na podstawie danych z pliku */
+    /**<summary>Generuje mape na podstawie danych z pliku</summary>
+     * <param name="content">Odczytana zawartosc pliku zrodlowego</param>*/
     private void GenerateMap(MapFileContent content)
     {
         map.Clear();
@@ -620,7 +654,8 @@ public class Controller : MonoBehaviour
             map.AddRoad(content.RoadStartList[i].Vect, content.RoadEndList[i].Vect);
     }
 
-    /* generuje agentow D na podstawie danych z pliku */
+    /**<summary>Generuje Agentow D na podstawie danych z pliku</summary>
+     * <param name="content">Odczytana zawartosc pliku zrodlowego</param>*/
     private void GenerateAgentsD(SimulationFileContent content)
     {
         //usun wszystkich dotychczasowych agentow D
@@ -639,8 +674,9 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* generuje agenta S na podstawie danych z pliku 
-     * zwraca referencje do nowoutworzonego agenta */
+    /**<summary>Generuje Agenta S na podstawie danych z pliku</summary>
+     * <param name="content">Odczytana zawartosc pliku zrodlowego</param>
+     * <returns>Zwraca referencej do utworzonego Agenta S lub null, jesli agent nie zostal stworzony*/
     private AgentS GenerateAgentS(SimulationFileContent content)
     {
         AgentS agent = null;
@@ -666,8 +702,9 @@ public class Controller : MonoBehaviour
      *            OBSLUGA ROAD MENU
      * **************************************** */
 
-    /* tworzy skrzyzowanie na podanej pozycji (jezeli wczesniej nie istnialo) i zwraca referencje do niego.
-     * jezeli skrzyzowanie juz wczesniej istnialo, zwraca referencje do juz istniejacego skrzyzowania o pozycji pos */
+    /**<summary>Tworzy skrzyzowanie na podanej pozycji (jezeli wczesniej nie istnialo) i zwraca referencje do niego.</summary>
+     * <param name="pos">Pozycja docelowa skrzyzowania</param>
+     * <returns>Jezeli skrzyzowanie juz wczesniej istnialo, zwraca referencje do juz istniejacego skrzyzowania o pozycji pos */
     private Crossroads CreateCrossoadOnPosition(Vector2 pos)
     {
         Crossroads cross;
@@ -695,7 +732,10 @@ public class Controller : MonoBehaviour
         return cross;
     }
 
-    /* sprawdza, czy mozna polaczyc ze soba podane skrzyzowania */
+    /**<summary>sprawdza, czy mozna polaczyc ze soba podane skrzyzowania</summary>
+     * <param name="c1">Testowane skrzyzowanie
+     * <param name="c2">Testowane skrzyzowanie
+     * <returns>true - jesli skrzyzowania moga byc ze soba polaczone. W przeciwnym wypadku zwraca false</returns>*/
     private bool CanBeConnected(Crossroads c1, Crossroads c2)
     {
         float a = (c1.LogicPosition.y - c2.LogicPosition.y) / (c1.LogicPosition.x - c2.LogicPosition.x); //wspolczynnik a porstej miedzy skrzyzowaniami
@@ -710,7 +750,7 @@ public class Controller : MonoBehaviour
      *           OBSLUGA REGION MENU
      * **************************************** */
 
-    /* generuje symbole stref bazujac na mapie map */
+    /**<summary>Generuje symbole stref bazujac na mapie map</summary>*/
     private void CreateRegionSigns()
     {
         GameObject prefab; //prefab, ktory ma zostac utworzony
@@ -728,7 +768,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* usuwa symbole stref i czysci liste */
+    /**<summary>Usuwa symbole stref</summary>*/
     private void ClearRegionSigns()
     {
         foreach(var r in regionSigns)
@@ -740,8 +780,8 @@ public class Controller : MonoBehaviour
      *           OBSLUGA AGENT MENU
      * **************************************** */
 
-    /* dodaje podana przez uzytkownika lcizbe agentow D do symulacji.
-     * przydziela im losowo miejsca i czas pracy oraz zamieszkania */
+    /**<summary>Dodaje podana przez uzytkownika lcizbe agentow D do symulacji.
+     * Przydziela im losowo miejsca i czas pracy oraz zamieszkania.</summary> */
     private void CreateAgentD()
     {
         int count = 0; //liczba agentow do dodania
@@ -780,7 +820,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* usuwa wskazana liczbe agentow D z symulacji */
+    /**<summary>Usuwa wskazana liczbe Agentow D z symulacji</summary>*/
     private void RemoveAgentsD()
     {
         int count = 0; //liczba agentow do dodania
@@ -809,9 +849,9 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* dodaje agenta do symulacji 
-     * home - miejsce zamieszkania
-     * work - miejsce, w ktorym agent pracuje */
+    /**<summary>Dodaje Agent D do symulacji</summary>
+     * <param name="home">Dom agenta</param>
+     * <param name="work"Miejsce pracy agenta</param>*/
     private void SpawnAgentD(Crossroads home, Crossroads work)
     {
         GameObject agentObject = (GameObject)Instantiate(agentDPrefab);
@@ -829,8 +869,7 @@ public class Controller : MonoBehaviour
     /* ****************************************
      *                   GUI
      * **************************************** */
-    /* tworzy formularz pobieranai danych od uzytkownika 
-     * method - metoda, ktora ma byc odpalona po wypelnieniu formularza */
+    /**<summary>Tworzy formularz pobierania danych od uzytkownika</summary>*/
     private void CreateInputForm()
     {
         GUIStyle style = new GUIStyle();
@@ -848,11 +887,10 @@ public class Controller : MonoBehaviour
         }
     }
 
-    /* oblicza pozycje poszczegolnych kontrolek inputForma na bazie ich rozmiarow
-     * textBoxSize - rozmiar textBoxa
-     * inputBoxSize - rozmiar inputBoxa 
-     * buttonSize - rozmiar buttona
-     * method - metoda, ktora ma zostac wykonana po wypelnieniu formularza */
+    /**<summary>Oblicza pozycje poszczegolnych kontrolek formularza pobierania danych</summary>
+     * <param name="textBoxSize">Rozmiar wiadmosci</param>
+     * <param name="inputBoxSize">Rozmiar pola pobierania danych</param>
+     * <param name="buttonSize">Rozmiar przycisku</param>*/
     private void CalculateInputFormMembers(Vector2 textBoxSize, Vector2 inputBoxSize, Vector2 buttonSize)
     {
         textBoxRect = new Rect();
@@ -879,16 +917,16 @@ public class Controller : MonoBehaviour
      *                POZOSTALE
      * **************************************** */
 
-    /* ustawia akcje action jako akcje aktywna. 
-     * isContinous - czy akcja ma byc ciagla */
+    /**<summary>Ustaiwa podana akcje jako aktywna</summary>
+     * <param name="action">Akcja, ktora ma byc wykonywana</param>
+     * <param name="isContinous">Czy akcja ma byc ciagla</param>*/
     private void SetActiveAction(ActionDelegate action, bool isContinous = false)
     {
         activeAction = action;
         isActionContinous = isContinous;
     }
 
-    /* deaktywuje wszystkie obiekty, ktore sa stworzone dla konkretnych dzialan
-     * (np. grid) */
+    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla konkretnych dzialan*/
     private void DeactivateAllObjects()
     {
         DeactivateRoadObjects();
@@ -896,22 +934,20 @@ public class Controller : MonoBehaviour
         DeactivateAgentObjects();
     }
 
-    /* deaktywuje wszystkie obiekty, ktore sa stworzone dla poprawnego zarzadzania drogami
-     * (np. grid) */
+    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych z drogami*/
     private void DeactivateRoadObjects()
     {
         possibleRoadDirections.SetActive(false);
         grid.SetActive(false);
     }
 
-    /* deaktywuje wszystkie obiekty, ktore sa stworzone dla poprawnego zarzadzania strefami (regionami)
-     * (np. krzyzyki) */
+    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych ze strefami*/
     private void DeactivateRegionObjects()
     {
         ClearRegionSigns();
     }
 
-    /* deaktywuje wszystkie obiekty, ktore sa stworzone dla poprawnego zarzadzania agentami */
+    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych z agentami*/
     private void DeactivateAgentObjects()
     {
         agentSHomeSign.SetActive(false);

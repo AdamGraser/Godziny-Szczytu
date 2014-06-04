@@ -3,15 +3,25 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+/**<summary>Klasa reprezentujaca inteligentny GPS, bazujacy na algorytmie genetycznym</summary>*/
 public class SmartGps : Gps
 {
+    /**<summary>Klasa reprezentujaca informacje o drodze</summary>*/
     private class RoadInfo
     {
+        /**<summary>Punkt koncowy drogi</summary>*/
         public Vector2 a;
+        /**<summary>Drugi punkt koncowy drogi</summary>*/
         public Vector2 b;
+        /**<summary>Czasy osiagniete na danej drodze</summary>*/
         public float [] time;
+        /**<summary>Ile razy przejechano</summary>*/
         public int[] howManyTimes;
 
+        /**<summary>Czy to ta sciezka</summary>
+         * <param name="start">Punkt poczatkowy</param>
+         * <param name="end">Punkt koncowy</param>
+         * <returns>Zwraca true, jest to 'ta' sciezka. W przeciwnym wypadku - zwraca false</returns>*/
         public bool IsThisPath(Vector2 start, Vector2 end)
         {
             bool result = false;
@@ -28,7 +38,9 @@ public class SmartGps : Gps
             return result;
         }
 
-        // Konstruktor
+        /**<summary>Konstruktor</summary>
+         * <param name="start">Punkt poczatkowy</param>
+         * <param name="end">Punkt koncowy</param>*/
         public RoadInfo(Vector2 start, Vector2 end, Map roadMap)
         {
             a = start;
@@ -48,6 +60,9 @@ public class SmartGps : Gps
             howManyTimes = howManyTimesTemp.ToArray();
         }
 
+        /**<summary>Zapamietaj uzyskany czas przejazdu</summary>
+         * <param name="newTime">Uzyskany czas</param>
+         * <param name="term"></param>*/
         public void RememberTime(float newTime, int term)
         {
             time[term] = (time[term] * howManyTimes[term] + newTime) / (howManyTimes[term] + 1);
@@ -55,30 +70,32 @@ public class SmartGps : Gps
         }
     }
 
-    //Liczba pamietanych sciezek dla kazdej konfiguracji
+    /**<summary>Liczba pamietanych sciezek dla kazdej konfiguracji</summary>*/
     private static int Ls = 5;
-    //Prawdopodobienstwo mutacji w %
+    /**<summary>Prawdopodobienstwo mutacji w %</summary>*/
     private static int Mp = 10;
 
-    // Predkosc teoretyczna (w przypadku braku korkow)
+    /**<summary>Predkosc teoretyczna (w przypadku braku korkow)</summary>*/
     private static int InitialSpeed = 10;
-    // Ilosc okresow dnia
+    /**<summary>Ilosc okresow dnia</summary>*/
     private static int Lt = 6;
 
-    //Maszynka do losowania
+    /**<summary>Maszynka do losowania</summary>*/
     private System.Random rand;
 
-    //Lista wszystkich wezlow na mapie
+    /**<summary>Lista wszystkich wezlow na mapie</summary>*/
     private List<Vector2> AllCrossroads;
     //private int numberOfCrossroads;
 
-    //Lista wszystkich odcinkow
+    /**<summary>Lista wszystkich odcinkow</summary>*/
     private List<RoadInfo> AllRoads;
 
-    //Lista wszystkich pamietanych obecnie sciezek
+    /**<summary>Lista wszystkich pamietanych obecnie sciezek</summary>*/
     private List<List<Vector2>> [] AllPaths;
 
-    //Przelicza godzine na pore dnia
+    /**<summary>Przelicza godzina na pore dnia</summary>
+     * <param name="hour">Godzina</param>
+     * <returns>Zwraca uzyskana z godziny pore dnia</returns>*/
     private int HourToTerm(int hour)
     {
         if ((hour >= 5) && (hour <= 7)) // rano
@@ -95,7 +112,11 @@ public class SmartGps : Gps
             return 0;
     }
 
-    //Zwraca czas przejazdu jednego odcinka
+    /**<summary>Zwraca czas przejazdu jednego odcinka</summary>
+     * <param name="a">Jeden z koncow odcinka</param>
+     * <param name="b">Drugi z koncow odcinka</param>
+     * <param name="term">Pora dnia przejazdu</param>
+     * <returns>Zwraca czas przejazdu podanego odcinka</returns>*/
     private float GetRoadTime(Vector2 a, Vector2 b, int term)
     {
         float result = 0;
@@ -110,8 +131,11 @@ public class SmartGps : Gps
         return result;
     }
 
-    //Sprawdza, czy sciezka laczy podane wezly
-    //Zwraca: 0 - nie laczy, 1 - laczy, 2 - laczy, ale w odwrotnej kolejnosci
+    /**<summary>Sprawdza, cze sciezka laczy podane wezly</summary>
+     * <param name="ListToCompare">Lista testowanych wezlow</param>
+     * <param name="start">Jeden z koncow odcinka</param>
+     * <param name="end">Drugi z koncow odcinka</param?
+     * <returns>Zwraca: 0 - nie laczy; 1- laczy; 2 - laczy, ale w odwrotnej kolejnosci</returns> */
     private short CmpPaths(List<Vector2>ListToCompare, Vector2 start, Vector2 end)
     {
         short result = 0;
@@ -129,8 +153,10 @@ public class SmartGps : Gps
         return result;
     }
 
-    //Funkcja krzyzujaca dwie sciezki
-    //Zwraca null, jesli sciezki nie sa mozliwe do skrzyzowania
+    /**<summary>Funkcja krzyzujaca dwie sciezki</summary>
+     * <param name="parent1">Sciezka</param>
+     * <param name="parent2">Sciezka</param>
+     * <returns>Zwraca skrzyzowana sciezke lub null, jesli sciezki nie sa mozliwe do skrzyzowania</returns>*/
     public List<Vector2> Crossbreed(List<Vector2> parent1, List<Vector2> parent2)
     {
         List<Vector2> child = null;

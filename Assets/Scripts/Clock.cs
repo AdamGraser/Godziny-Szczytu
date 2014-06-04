@@ -1,15 +1,13 @@
 ﻿using UnityEngine;
 
-/* globalny zegar */
+/**<summary>Funkcja reprezentujaca globalny, 24-godzinny zegar</summary>*/
 public class Clock : MonoBehaviour
 {
-    /* ile sekund trwa doba w grze */
+    /**<summary>Ile sekund trwa doba w grze</summary>*/
     public static readonly float Day = 360f;
-
-    /* aktualny czas */
+    /**<summary>Aktualny czas (w sekundach)</summary>*/
     public float DayTime {get; set;}
-
-    /* aktualna godzina */
+    /**<summary>Aktualna godzina</summary>*/
     public int Hour
     {
         get
@@ -24,11 +22,13 @@ public class Clock : MonoBehaviour
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
+    /** <summary>Funkcja przygotowujaca zegar do dzialania</summary> */
     void Awake() 
     {
         DayTime = 0;
     }
 
+    /** <summary>Funkcja wywolywana podczas kazdej klatki.</summary> */
     void Update() 
     {
         DayTime = (DayTime + Time.deltaTime) % Day;

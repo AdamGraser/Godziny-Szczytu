@@ -1,25 +1,29 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.IO;
 using UnityEngine;
 
-/* agent, ktory przemieszcza sie po miescie w sposob inteligentny */
-[Serializable()]
+/**<summary>Klasa reprezentujaca Agenta S, przemiejszczajacego sie po miejsce w sposob inteligentny</summary>*/
 public class AgentS : AgentD
 {
     /* wymagane do obslugi inteligentnego GPS */
+    /**<summary>Inteligentny GPS</summary>*/
     private SmartGps smartGps;
-    private float startTime; //czas, w ktorym rozpoczeto przemierzac nowy odcinek drogi
-    private float endTime; //czas w ktorym skonczono przemierzac aktualny odcinek drogi
-    private Vector2 beginningCross; //skrzyzowanie, rozpoczynajace konretny odcinek trasy
+    /**<summary>Czas, w ktorym zaczeto pokonywac konrketny odcinek na trasie</summary>*/
+    private float startTime;
+    /**<summary>Czas, w ktorym skonczono pokonywac konkretny odcinek na trasie</summary>*/
+    private float endTime;
+    /**<summary>Skrzyzowanie, ktore jest poczatkiem aktualnego odcinka na trasie</summary>*/
+    private Vector2 beginningCross;
 
     /* zycie agenta */
-    private bool goHome; //czy ma teraz jechac do domu
+    /**<summary>Czy agent ma teraz jechac do domu, czy do pracy</summary>*/
+    private bool goHome;
 
     /* ***********************************************************************************
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
+    /** <summary>Funkcja przygotowujaca Agenta D do zabawy. Wywolywana na poczatku istnienia obiektu, przed funkcja Start.</summary> */
     protected override void Awake()
     {
         base.Awake();
@@ -31,12 +35,18 @@ public class AgentS : AgentD
         goHome = true;
     }
 
+    /** <summary>Funkcja przygotowujaca Agenta D. Wywolywana na poczatku istnienia obiektu, po funkcji Awake.</summary> */
     protected override void Start()
     {
         //schowaj sie pod mape
-        base.Finish();
+        isDriving = false;
+        transform.Translate(0, -3, 0);
+        rigidbody.isKinematic = true;
+        model.SetActive(false);
     }
 
+    /** <summary>Funkcja wywolywana przy odpaleniu triggera (tego obiektu lub obiektu, z ktorym Agent sie spotkal)</summary>
+     *  <param name="other">Obiekt, z ktorym spotkal sie nasz Agent.</param> */
     protected override void OnTriggerEnter(Collider other)
     {
         //zmierz czas i zapisz go do GPS
@@ -58,7 +68,7 @@ public class AgentS : AgentD
      *                 FUNKCJE ZWIAZANE Z 'ZYCIEM CODZIENNYM' (COROUTINES)
      * *********************************************************************************** */
 
-    /* coroutine. agent rozpoczyna podroz z domu do pracy */
+    /**<summary>Coroutine. Sprawdza, czy mozna wyslac agenta do pracy. Jesli tak, to to robi. W przeciwnym wypadku czeka pol sekundy.</summary>*/
     protected override IEnumerator GoWork()
     {
         for(; ;)
@@ -85,6 +95,7 @@ public class AgentS : AgentD
                     transform.position = startPosition;
                     transform.rotation = Quaternion.Euler(0, startAngle, 0);
                     model.SetActive(true);
+                    Explode();
                 }
             }
 
@@ -92,7 +103,7 @@ public class AgentS : AgentD
         }
     }
 
-    /* coroutine. rozpoczyna podroz z pracy do domu */
+    /**<summary>Coroutine. Sprawdza, czy mozna wyslac agenta do domu. Jesli tak, to to robi. W przeciwnym wypadku czeka pol sekundy.</summary>*/
     protected override IEnumerator GoHome()
     {
         for(; ; )
@@ -117,8 +128,7 @@ public class AgentS : AgentD
                     transform.position = startPosition;
                     transform.rotation = Quaternion.Euler(0, startAngle, 0);
                     model.SetActive(true);
-
-                    Debug.Log("start:" + startPosition + " real: " + transform.position);
+                    Explode();
                 }
             }
 
@@ -130,9 +140,9 @@ public class AgentS : AgentD
      *          FUNKCJE ZWIAZANE Z ROZPOCZECIEM, KONTYNUACJA I ZAKONCZENIEM JAZDY
      * *********************************************************************************** */
 
-    /* oblicza poczatkowa pozycje i kat. wyznacza trase do celu 
-     * start - startowe skrzyzowanie 
-     * end - skrzyzowanie docelowe */
+    /**<summary>Oblicza poczatkowa pozycje i kat dla agenta. Wyznacza trase do celu.</summary>
+     * <param name="start">startowe skrzyzowanie</param>
+     * <param name="end">skrzyzowanie docelowe</param> */
     protected override void CalculateStartMembers(Vector2 start, Vector2 end)
     {
         rigidbody.isKinematic = false;
@@ -162,7 +172,7 @@ public class AgentS : AgentD
         NextDestination();
     }
 
-    /* konczy podroz. znika pod ziemie i tam czeka az bedzie znow mogl wyjechac */
+    /**<summary>Konczy podrozagenta. Zakpuje go pod ziemie, gdzie czeka na godzine, by znow sie pokazac na drogach</summary>*/
     protected override void Finish()
     {
         Debug.Log("Finish!");
@@ -177,7 +187,7 @@ public class AgentS : AgentD
         goHome = !goHome;
     }
 
-    /* wprawia agenta S w zycie */
+    /**<summary>Wprawia agenta w zycie (w rutyne jezdzenia tam i z powrotem)</summary>*/
     public void Live()
     {
         StartCoroutine("GoWork");
@@ -187,16 +197,16 @@ public class AgentS : AgentD
      *                   FUNKCJE ZWIAZANE Z ZAPISEM I ODCZYTEM Z PLIKU
      * *********************************************************************************** */
 
-    /* zapisuje gps do wskazanego pliku 
-     * stream - strumien, w ktorym ma zosstac zapisany GPS*/
+    /**<summary>Zapisuje inteligentny GPS do pliku</summary>
+     * <param name="stream">Plik, w ktorym ma byc zapisany GPS</param>*/
     public void SaveGPS(FileStream stream)
     {
         smartGps.SaveToFile(stream);
     }
 
-    /* laduje gps ze wskazanego pliku
-     * stream - strumien, z ktorego ma zostac zaladowany GPS
-     * map - mapa */
+    /**<summary>Laduje inteligentny GPS z pliku</summary>
+     * <param name="stream">Plik, z ktorego ma zostac zaladowany GPS</param>
+     * <param name="map">Mapa, potrzebna do poprawnego skonfigurowania GPS po zaladowaniu</param>*/
     public void LoadGPS(FileStream stream, Map map)
     {
         smartGps.LoadFromFile(stream, map);
@@ -206,13 +216,15 @@ public class AgentS : AgentD
      *                                     POZOSTALE
      * *********************************************************************************** */
 
-    /* laduje zegar */
+    /**<summary>Laduje zegar</summary>
+     *<param name="clock">Zegar do zaladowania</param>*/
     public void LoadClock(Clock clock)
     {
         this.clock = clock;
     }
 
-    /* laduje mape do GSP */
+    /**<summary>Laduje mapy do GPS, gdy ten nie byl ladowany z pliku</summary> 
+     * <param name="map">Mapa do zaladowania</param>*/
     public void LoadGPSMap(Map map)
     {
         smartGps.LoadMap(map);

@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-/* klasa wykorzystywana do zapisu i odczytu symulacji z pliku */
+/**<summary>Klasa wykorzystywana do zapisu i odczytu z pliku danych nt. calej symulacji</summary>*/
 [Serializable()]
 public class SimulationFileContent : ISerializable
 {
-    public MapFileContent TheMap {set;get;} //przygotowana do zapisu lub odczytu zawartosc mapy
-    public List<AgentFileContent> AgentDList {set;get;} //przygotowanii do odczytu lub zapiosu agenci D
-    public List<AgentFileContent> AgentSList { set; get; } // przygotowanie do odczytu lub zapisu agenci S
+    /**<summary>Przygotowana do zapisu lub odczytu zawartosc mapy</summary>*/
+    public MapFileContent TheMap {set;get;}
+    /**<summary>Przygotowana do zapisu lub odczytu zawartosc lista Agentow D</summary>*/
+    public List<AgentFileContent> AgentDList {set;get;}
+    /**<summary>Przygotowana do zapisu lub odczytu zawartosc lista Agentow S</summary>*/
+    public List<AgentFileContent> AgentSList { set; get; }
 
-    /* konstruktor na potrzeby Serializable - stosowac podczas zapisu */
+    /**<summary>Konstruktor na potrzeby Serializable - stosowac podczas zapisu</summary>*/
     public SimulationFileContent()
     {
         TheMap = new MapFileContent();
@@ -18,8 +21,9 @@ public class SimulationFileContent : ISerializable
         AgentSList = new List<AgentFileContent>();
     }
 
-    /* kontruktor wymagany dla interfejsu Serializable
-     * info - plik, z ktorego czytamy (?) */
+    /**<summary>Kontruktor</summary>
+     * <param name="info">Plik, z ktorego czytamy dane (?)</param>
+     * <param name="ctxt">Kontekst (?)</param>*/
     public SimulationFileContent(SerializationInfo info, StreamingContext ctxt)
     {
         TheMap = new MapFileContent();
@@ -31,8 +35,9 @@ public class SimulationFileContent : ISerializable
         AgentSList = (List<AgentFileContent>)info.GetValue("AgentSList", typeof(List<AgentFileContent>));
     }
 
-    /* dodaje do pliku skladowe klasy 
-     * info - plik, do ktorego zapisujemy (?) */
+    /**<summary>Zapisuje dane do pliku wyznaczonego przez info</summary>
+     * <param name="info">Plik, do ktorego zapisujemy dane (?)</param>
+     * <param name="ctxt">Kontekst (?)</param>*/
     public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
     {
         info.AddValue("Map", TheMap);

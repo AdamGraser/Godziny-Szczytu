@@ -2,26 +2,28 @@
 using System.Runtime.Serialization;
 using UnityEngine;
 
-/* rozszerza funkcjonalnosc klasy Vector2 */
+/**<summary>Klasa rozszerzajaca funkcjonalnosc klasy Vector2 o serializacje</summary>*/
 [Serializable()]
 public class Vector2Serializable : ISerializable
 {
     //vector 2
     public Vector2 Vect { set; get; }
 
-    /* kontruktor */
+    /**<summary>Konstruktor na potrzeby Serializable - stosowac podczas zapisu</summary>*/
     public Vector2Serializable()
     {
     }
 
-    /* kontruktor przyjmujacy Vector2 */
+    /**<summary>Kontruktor</summary>
+     * <param name="v">Vector2, z ktorego wyciaga informacje</param> */
     public Vector2Serializable(Vector2 v)
     {
         Vect = v;
     }
 
-    /* kontruktor wymagany dla interfejsu Serializable
-     * info - plik, z ktorego czytamy (?) */
+    /**<summary>Kontruktor</summary>
+     * <param name="info">Plik, z ktorego czytamy dane (?)</param>
+     * <param name="ctxt">Kontekst (?)</param>*/
     public Vector2Serializable(SerializationInfo info, StreamingContext ctxt)
     {
         float x, y;
@@ -30,8 +32,9 @@ public class Vector2Serializable : ISerializable
         Vect = new Vector2(x, y);
     }
 
-    /* dodaje do pliku skladowe klasy 
-     * info - plik, do ktorego zapisujemy (?) */
+    /**<summary>Zapisuje dane do pliku wyznaczonego przez info</summary>
+     * <param name="info">Plik, do ktorego zapisujemy dane (?)</param>
+     * <param name="ctxt">Kontekst (?)</param>*/
     public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
     {
         info.AddValue("X", Vect.x);

@@ -1,23 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-/* Reprezentuje mape w postaci grafu (polaczonych ze soba punktow z okresleniem dlugosci pomiedzy nimi. */
-[Serializable()]
-public class Map : MonoBehaviour, ISerializable
+/**<summary>Klasa przechowujaca informacje nt. skrzyzowan i drog</summary> */
+public class Map : MonoBehaviour
 {
+    /**<summary>Prefab skrzyzowania</summary>*/
     public GameObject crossroadsPrefab;
+    /**<summary>Prefab drogi</summary>*/
     public GameObject roadPrefab;
 
-    private Dictionary<Vector2, Crossroads> crossroads; //zbior skrzyzowan. kluczem jest ich logiczna pozycja
+    private Dictionary<Vector2, Crossroads> crossroads;
+    /**<summary>Zbior skrzyzowan. Kluczem jest ich logiczna pozycja</summary>*/
     public Dictionary<Vector2, Crossroads> AllCrossroads { get { return crossroads; } } 
-    private Dictionary<Vector2, Road> roads; //zbior drog. kluczem jest ich punkt srodkowy
+
+    private Dictionary<Vector2, Road> roads;
+    /**<summary>Zbior drog. Kluczem jest isc srodkowy punkt</summary>*/
     public Dictionary<Vector2, Road> AllRoads { get { return roads; } }
 
     /* ***********************************************************************************
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
+    /** <summary>Funkcja przygotowujaca mape do zabawy. Wywolywana na poczatku istnienia obiektu.</summary> */
     void Awake()
     {
         crossroads = new Dictionary<Vector2, Crossroads>();
@@ -28,7 +31,8 @@ public class Map : MonoBehaviour, ISerializable
      *              FUNKCJE PUBLICZNE DODAJACE / USUWAJACE DROGI I SKRZYZOWANIA
      * *********************************************************************************** */
 
-    /* dodaje skrzyzowanie na podana pozycje logiczna */
+    /**<summary>Dodaje skrzyzowanie na podana pozycje</summary> 
+     * <param name="pos">Pozycja logiczna, na ktorej zostanie umieszczone skrzyzowanie</param>*/
     public void AddCrossroads(Vector2 pos)
     {
         Crossroads cross; //nowoutworzone skrzyzowanie
@@ -41,7 +45,8 @@ public class Map : MonoBehaviour, ISerializable
         }
     }
 
-    /* usuwa skrzyzowanie znajdujace sie na podanej pozycji, wraz z polaczonymi drogami */
+    /**<summary>Usuwa skrzyzowanie znajdujace sie na podanej pozycji, wraz z polaczonymi z nim drogami</summary> 
+     * <param name="pos">Pozycja skrzyzowania, ktore ma zostac usuniete</param>*/
     public void RemoveCrossroads(Vector2 pos)
     {
         Crossroads cross; //skrzyzowanie do usuniecia
@@ -63,9 +68,10 @@ public class Map : MonoBehaviour, ISerializable
         }
     }
 
-    /* tworzy droga znajdujaca sie miedzy podanymi skrzyzowaniami. 
-     * nastepnie tworzy polaczenia miedzy nimi (logiczne, nizszy poziom abstrakcji ;) ) 
-     * c1Pos, c2Pos - pozycje skrzyzowan, pomiedzy ktorymi ma znajdowac sie droga */
+    /**<summary>Tworzy droge znajdujaca sie miedzy podanymi pozycjami skrzyzowan. 
+     * Nastepnie tworzy polaczenia miedzy nimi (logiczne, nizszy poziom abstrakcji)</summary>
+     * <param name="c1Pos">Pozycja skrzyzowania</param>
+     * <param name="c2Pos">Pozycja skrzyzowania</param> */
     public void AddRoad(Vector2 c1Pos, Vector2 c2Pos)
     {
         Road road;
@@ -111,8 +117,8 @@ public class Map : MonoBehaviour, ISerializable
         }
     }
 
-    /* usuwa droge i polaczenia miedzy skrzyzowaniani 
-     * pos - punkt srodkowy drogi */
+    /**<summary>Usuwa droga i polaczenia miedzy skrzyzowaniami, ktore ta droga laczyla</summary> 
+     * <param name="pos">Punkt srodkowy drogi, ktora ma zostac usunieta</param>*/
     public void RemoveRoad(Vector2 pos)
     {
         Road road;
@@ -139,8 +145,9 @@ public class Map : MonoBehaviour, ISerializable
      *                             POZOSTALE FUNKCJE PUBLICZNE
      * *********************************************************************************** */
 
-    /* zwraca droge, ktora zawiera w sobie podany punkt.
-     * jesli taka drogi nie istnieje, zwraca null */
+    /**<summary>Szuka drogi zawierajacaej podany punkt.</summary>
+     <param name="point">Testowany punkt</param>
+     <returns>Zwraca referencje do drogi, jesli taka zostala znaleziona. W przeciwnym wypadku zwraca null</returns>*/
     public Road FindRoadContainingPoint(Vector2 point)
     {
         foreach(var r in roads)
@@ -152,9 +159,10 @@ public class Map : MonoBehaviour, ISerializable
         return null;
     }
 
-    /* znajduje i zwraca droge, ktora przecina podana droge road.
-     * zwraca null, jesli nie istnieje zadna taka droga 
-     * c1, c2 - konce drogi */
+    /**<summary>Szuka drogi, ktora przecina podana droga.</summary>
+     * <param name="c1">Jeden z koncow testowanej drogi</param>
+     * <param name="c2">Drugi z koncow testowanej drogi</param>
+     * <returns>Zwraca referencje do drogi, jesli taka zostala znaleziona. W przeciwnym wypadku zwraca null</returns>*/
     public Road FindRoadIntersectingRoad(Crossroads c1, Crossroads c2)
     {
         //sprawdzanie kazdej drogi
@@ -174,7 +182,9 @@ public class Map : MonoBehaviour, ISerializable
         return null;
     }
 
-    /* zwraca liste skrzyzowan danego regionu */
+    /**<summary>Szuka skrzyzowan o danej strefie</summary>
+     * <param name="region">Strefa, do ktorej maja byc przypisane skrzyzowania</param>
+     * <returns>Zwraca liste znalezionych skrzyzowan</returns>*/
     public List<Crossroads> GetCrossroadsListWithRegion(Region region)
     {
         List<Crossroads> list = new List<Crossroads>();
@@ -188,7 +198,7 @@ public class Map : MonoBehaviour, ISerializable
         return list;
     }
 
-    /* czysci cala mape */
+    /**<summary>Czysci cala mape</summary>*/
     public void Clear()
     {
         List<Crossroads> crosses = new List<Crossroads>();
@@ -202,95 +212,28 @@ public class Map : MonoBehaviour, ISerializable
         AllCrossroads.Clear();
     }
 
-
-    /* ***********************************************************************************
-     *                   FUNKCJE ZWIAZANE Z ZAPISEM I ODCZYTEM Z PLIKU
-     * *********************************************************************************** */
-    /* kontruktor wymagany dla interfejsu Serializable
-     * info - plik, z ktorego czytamy (?) */
-    public Map(SerializationInfo info, StreamingContext ctxt)
-    {
-        LoadFromFile(info, ctxt);
-    }
-
-    /* laduje dane z pliku 
-     * info - plik, z ktorego pobierane sa dane (?) */
-    public void LoadFromFile(SerializationInfo info, StreamingContext ctxt)
-    {
-        List<Vector2Serializable> crossList = new List<Vector2Serializable>();
-        List<Region> crossRegionList = new List<Region>();
-        List<Vector2Serializable> roadStartList = new List<Vector2Serializable>();
-        List<Vector2Serializable> roadEndList = new List<Vector2Serializable>();
-        
-        //odzczyt z pliku
-        crossList = (List<Vector2Serializable>)info.GetValue("Crossroads", typeof(List<Vector2Serializable>));
-        crossRegionList = (List<Region>)info.GetValue("CrossroadsRegions", typeof(List<Region>));
-        roadStartList = (List<Vector2Serializable>)info.GetValue("RoadStarts", typeof(List<Vector2Serializable>));
-        roadEndList = (List<Vector2Serializable>)info.GetValue("RoadEnds", typeof(List<Vector2Serializable>));
-
-        //czyszczenie mapy
-        Clear();
-
-        //tworzenie obiektow
-        for(int i = 0; i < crossList.Count; ++i)
-        {
-            AddCrossroads(crossList[i].Vect);
-            AllCrossroads[crossList[i].Vect].CityRegion = crossRegionList[i];
-        }
-
-        for(int i = 0; i < roadEndList.Count; ++i)
-            AddRoad(roadStartList[i].Vect, roadEndList[i].Vect);
-    }
-
-    /* dodaje do pliku skladowe klasy 
-     * info - plik, do ktorego zapisujemy (?) */
-    public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
-    {
-        List<Vector2Serializable> crossList = new List<Vector2Serializable>();
-        List<Region> crossRegionList = new List<Region>();
-        List<Vector2Serializable> roadStartList = new List<Vector2Serializable>();
-        List<Vector2Serializable> roadEndList = new List<Vector2Serializable>();
-
-        foreach(var c in AllCrossroads)
-        {
-            crossList.Add(new Vector2Serializable(c.Value.LogicPosition));
-            crossRegionList.Add(c.Value.CityRegion);
-        }
-        foreach(var r in AllRoads)
-        {
-            roadStartList.Add(new Vector2Serializable(r.Value.Start.LogicPosition));
-            roadEndList.Add(new Vector2Serializable(r.Value.End.LogicPosition));
-        }
-
-        //zapis do pliku
-        info.AddValue("Crossroads", crossList);
-        info.AddValue("CrossroadsRegions", crossRegionList);
-        info.AddValue("RoadStarts", roadStartList);
-        info.AddValue("RoadEnds", roadEndList);
-    }
-
-    /* ***********************************************************************************
-     *                                     POZOSTALE
-     * *********************************************************************************** */
-
-    /* zwykly konstruktor */
-    public Map()
-    {
-    }
-
     /* ***********************************************************************************
      *                                 PRYWATNA KLASA MATH
      *                       Rozszerza funkcjonalnosc klas Math i Mathf
      * *********************************************************************************** */
+    /**<summary>Rozszerza funkcjonalnosc klas Math i Mathf</summary>*/
     private class Math
     {
-        /* oblicza wspolczynnik macierzy 3x3, utworzonej z danych pochodzacych z 3 punktow */
+        /**<summary>Oblicza wspolczynnik macierzy 3x3, utworzonej z danych pochodzacych z 3 punktow</summary>
+         * <param name="a">Punkt</param>
+         * <param name="b">Punkt</param>
+         * <param name="c">Punkr</param>
+         * <returns>Zwraca obliczony wspolczynnik</returns>*/
         public static float Det(Vector2 a, Vector2 b, Vector2 c)
         {
             return a.x*b.y + b.x*c.y + c.x*a.y - c.x*b.y - a.x*c.y - b.x*a.y;
         }
 
-        /* sprawdza, czy punkt C przynalezy do odcinka |AB| */
+        /**<summary>Sprawdza, czy punkt C przynalezy do odcinak |AB|</summary>
+         * <param name="a">Punkt odcinka</param>
+         * <param name="b">Punkt odcinka</param>
+         * <param name="c">Testowany punkr</param>
+         * <returns>Zwracatrue, jesli punkt C nalezy do |AB|. W przeciwnym wypadku zwraca false</returns>*/
         public static bool IsPointBelongingToSegment(Vector2 a, Vector2 b, Vector2 c)
         {
             float det = Det(a, b, c);

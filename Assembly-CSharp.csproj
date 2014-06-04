@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_STANDALONE_WIN;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_STANDALONE_WIN;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -46,6 +46,19 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Models\Detonator\System\Detonator.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorBurstEmitter.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorCloudRing.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorFireball.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorForce.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorGlow.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorHeatwave.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorLight.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorShockwave.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorSmoke.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorSound.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorSparks.cs" />
+     <Compile Include="Assets\Models\Detonator\System\DetonatorSpray.cs" />
      <Compile Include="Assets\Scripts\AgentD.cs" />
      <Compile Include="Assets\Scripts\AgentFileContent.cs" />
      <Compile Include="Assets\Scripts\AgentS.cs" />
@@ -68,7 +81,7 @@
      <Compile Include="Assets\Scripts\SmartGps.cs" />
      <Compile Include="Assets\Scripts\TrafficLight.cs" />
      <Compile Include="Assets\Scripts\Vector2Serializable.cs" />
-     <Compile Include="Assets\Scripts\Wall.cs" />
+     <None Include="Assets\Models\Detonator\Resources\Detonator\Textures\HeatDistort.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

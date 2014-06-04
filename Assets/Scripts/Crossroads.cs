@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/* klasa reprezentujaca skrzyzowanie */
+/**<summary>Klasa reprezentujaca skrzyzowanie</summary>*/
 public class Crossroads : MonoBehaviour 
 {
     /* ogolne */
-    private Dictionary<Vector2, Crossroads> connectedCrossroads; //skrzyzowania, ktore sasiaduja z tym
+    private Dictionary<Vector2, Crossroads> connectedCrossroads;
+    /**<summary>Skrzyzowania polaczone z tym skrzyzowaniem</summary>*/
     public Dictionary<Vector2, Crossroads> ConnectedCrossroads { get { return connectedCrossroads; } }
+    /**<summary>Strefa, do ktorej nalezy to skrzyzowanie</summary>*/
     public Region CityRegion { set; get; } //region (strefa), do ktorej nalezy dane skrzyzowanie
-    /* pozycja logiczna. odzworowuje wspolrzedne: X i Z. bezposrednio powiazana z rzeczywista pozycja.
-     * zmiana pozycji logicznej skutkuje zmiana pozycji rzeczywistej */
+    /**<summary>Pozycja logiczna. odzworowuje wspolrzedne: X i Z. Bezposrednio powiazana z rzeczywista pozycja.
+     * Zmiana pozycji logicznej skutkuje zmiana pozycji rzeczywistej</summary> */
     public Vector2 LogicPosition
     {
         get
@@ -23,7 +25,7 @@ public class Crossroads : MonoBehaviour
             transform.position = new Vector3(value.x, transform.position.y, value.y);
         }
     }
-    /* prawdziwa pozycja na swiecie */
+    /**<summary>Rzeczywista pozycja na swiecie</summary>*/
     public Vector3 RealPosition 
     { 
         set 
@@ -38,18 +40,26 @@ public class Crossroads : MonoBehaviour
     } 
 
     /* zwiazane z dopuszczaniem ruchu (otwieraniem drog) */
-    public GameObject trafficLightPrefab; //prefab swiatel
-    public float greenLightTime; //czas w sekunbdach, przez ktory pali sie zielone swiatlo
-    public float intertime; //czas w sekundach miedzy zgasnieciem zielonego i zapaleniem sie innego zielonego
-    private bool isWaitingTime; //czy nalezy chwile poczekac, zanim zapalimy zielone swiatlo
-    private Dictionary<Crossroads, TrafficLight> lights; //swiatla prowadzace do danych skrzyzowan
-    private List<TrafficLight> greenLightOrder; //kolejnosc zapalania sie zielonych swiatel
-    private int greenLight; //aktualnie palace sie zielone swiatlo
+    /**<summary>Prefab sygnalizacji swietlnej</summary>*/
+    public GameObject trafficLightPrefab;
+    /**<summary>Czas (w sekundach), przez ktory ma sie palic zielone swiatlo</summary>*/
+    public float greenLightTime;
+    /**<summary>Czas (w sekundach) miedzy zaapaleniem sie zielonego swiatla i zgasnieciem zielonego dla innej drogi</summary>*/
+    public float intertime;
+    /**<summary>Czy nalezy chwile poczekac, zanim zostanie zapalone zielone swiatlo</summary>*/
+    private bool isWaitingTime;
+    /**<summary>Sygnalizacja swietlna</summary>*/
+    private Dictionary<Crossroads, TrafficLight> lights;
+    /**<summary>Kolejnosc zapalania sie zielonych swiatel dla drog</summary>*/
+    private List<TrafficLight> greenLightOrder;
+    /**<summary>Czy aktualnie pali sie zielone swiatlo</summary>*/
+    private int greenLight;
 
     /* ***********************************************************************************
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
+    /** <summary>Funkcja przygotowujaca skrzyzowanie do dzialania</summary> */
     void Awake()
     {
         CityRegion = Region.Neutral;
@@ -60,12 +70,11 @@ public class Crossroads : MonoBehaviour
         isWaitingTime = false;
     }
 
-
     /* ***********************************************************************************
      *                                     COROUTINES
      * *********************************************************************************** */
 
-    /* zamyka aktualnie otwarta droge i otwiera nastepna. */
+    /** <summary>Coroutine. Zamyka aktualnie otwarta droge i otwiera nastepna</summary> */
     private IEnumerator OpenNextRoad()
     {
         while(lights.Count > 2) //jezeli skrzyzowanie laczy dwa inne, to zachowuje sie jak zakret
@@ -95,7 +104,8 @@ public class Crossroads : MonoBehaviour
      *                                 FUNKCJE PUBLICZNE
      * *********************************************************************************** */
 
-    /* laczy nasze skrzyzowanie z podanym. (jednak nie laczy podanego z naszym!) */
+    /** <summary>Laczy nasze skrzyzowanie z podanym (ednak nie laczy podanego z naszym!</summary>
+     <param name="cross">Skrzyzownie, ktora ma zostac polaczone z naszym.</param>*/
     public void Connect(Crossroads cross)
     {
         TrafficLight light = ((GameObject)Instantiate(trafficLightPrefab)).GetComponent<TrafficLight>();
@@ -123,7 +133,8 @@ public class Crossroads : MonoBehaviour
             
     }
 
-    /* usuwa polaczenie miedzy naszym skrzyzowaniem a podanym. (jednak podane skrzyzowanie wciaz jest polaczone z naszym!) */
+    /**<summary>Usuwa polaczenie miedzy naszym skrzyzowaniem a podanym (jednak podane skrzyzowanie wciaz jest polaczone z naszym!)</summary>
+     * <param name="cross">Skrzyzowanie, ktora od ktorego ma zostac rozlaczone nasze skrzyzowanie</param>*/
     public void Disconnect(Crossroads cross)
     {
         try

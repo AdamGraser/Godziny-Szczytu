@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-/* klasa wykorzystywana do zapisu i odczytu z pliku danych nt. agenta */
+/**<summary>Klasa wykorzystywana do zapisu i odczytu z pliku danych nt. agenta</summary>*/
 [Serializable()]
 public class AgentFileContent : ISerializable
 {
-    public Vector2Serializable HomePlace { get; set; } //miejsce, w ktorym mieszka agent
-    public float HomeMoveOut { get; set; } //czas, o ktorym agent wyjezdza z domu
-    public Vector2Serializable WorkPlace { get; set; } //miejsce, w ktorym pracuje agent
-    public float WorkMoveOut { get; set; } //czas, o ktorym agent wyjazdza z pracy
+    /**<summary>Miejsce. w ktorym mieszka agent</summary>*/
+    public Vector2Serializable HomePlace { get; set; }
+    /**<summary>Czas, w ktorym agent opuszcza dom</summary>*/
+    public float HomeMoveOut { get; set; }
+    /**<summary>Miejsce. w ktorym pracuje agent</summary>*/
+    public Vector2Serializable WorkPlace { get; set; }
+    /**<summary>Czas, w ktorym agent opuszcza prace</summary>*/
+    public float WorkMoveOut { get; set; } 
 
-    /* konstruktor na potrzeby Serializable - stosowac podczas zapisu */
+    /**<summary>Konstruktor na potrzeby Serializable - stosowac podczas zapisu</summary>*/
     public AgentFileContent()
     {
     }
 
-    /* kontruktor pobierajacy agenta
-     * agent - agent D, z ktorego pobrac informacje */
+    /**<summary>Kontruktor</summary>
+     * <param name="agent">Agent, z ktorego wyciaga informacje</param> */
     public AgentFileContent(AgentD agent)
     {
         HomePlace = new Vector2Serializable(agent.HomePlace);
@@ -25,8 +29,8 @@ public class AgentFileContent : ISerializable
         WorkMoveOut = agent.WorkMoveOut;
     }
 
-    /* kontruktor pobierajacy agenta
-     * agent - agent S, z ktorego pobrac informacje */
+    /**<summary>Kontruktor</summary>
+     * <param name="agent">Agent, z ktorego wyciaga informacje</param> */
     public AgentFileContent(AgentS agent)
     {
         HomePlace = new Vector2Serializable(agent.HomePlace);
@@ -35,8 +39,9 @@ public class AgentFileContent : ISerializable
         WorkMoveOut = 0;
     }
 
-    /* kontruktor wymagany dla interfejsu Serializable
-     * info - plik, z ktorego czytamy (?) */
+    /**<summary>Kontruktor</summary>
+     * <param name="info">Plik, z ktorego czytamy dane (?)</param>
+     * <param name="ctxt">Kontekst (?)</param>*/
     public AgentFileContent(SerializationInfo info, StreamingContext ctxt)
     {
         HomePlace = (Vector2Serializable)info.GetValue("HomePlace", typeof(Vector2Serializable));
@@ -45,8 +50,9 @@ public class AgentFileContent : ISerializable
         WorkMoveOut = (float)info.GetValue("WorkMoveOut", typeof(float));
     }
 
-    /* dodaje do pliku skladowe klasy 
-     * info - plik, do ktorego zapisujemy (?) */
+    /**<summary>Zapisuje dane do pliku wyznaczonego przez info</summary>
+     * <param name="info">Plik, do ktorego zapisujemy dane (?)</param>
+     * <param name="ctxt">Kontekst (?)</param>*/
     public void GetObjectData(SerializationInfo info, StreamingContext ctxt)
     {
         info.AddValue("HomePlace", HomePlace);

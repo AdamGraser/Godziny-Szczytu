@@ -1,69 +1,81 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-/* Reprezentuje automatyczne menu.
- * Szuka przyciskow, ktore sa dziecmi tego obiektu i wyswietla */
+/**<summary>Reprezentuje menu</summary>*/
 public class Menu : MonoBehaviour
 {
-	/* miejsce osadzenia menu na ekranie
-	 * Mozliwe wartosci:
-	 * 1 - gora (dla verticalHandle); prawo (dla horizontalHandle)
-	 * 0 - centrum (dla verticalHandle); centrum (dla horizontalHandle)
-	 * -1 - dol (dla verticalHandle); lewo (dla horizontalHandle) */
-	public int horizontalHandle;
-	public int verticalHandle;
-	/* pozycja menu */
-	public int menuXPosition;
-	public int menuYPosition;
-	/* czy menu ma miec orientacje pozioma */
-	public bool horizontalOrientation;
-	/* rozmiary przyciskow */
-	public int buttonWidth;
-	public int buttonHeight;
-	/* odstep miedzy przyciskami */
-	public int buttonDistance;
-	/* kontroler odbierajacy zdarzenia od przyciskow */
-	public Controller listener;
+    /**<summary>Miejsce osedzenia menu w poziomie
+     * Mozliwe wartosci:
+     * 1 - prawo
+     * 0 - centrum
+     * -1 -lewo </summary>*/
+    public int horizontalHandle;
+    /**<summary>Miejsce osedzenia menu w pionie
+     * Mozliwe wartosci:
+     * 1 - gora 
+     * 0 - centrum 
+     * -1 - dol </summary>*/
+    public int verticalHandle;
 
-	/* tablice przechowujace informacje nt. przyciskow */
-	Button[] buttons;
+    /* pozycja menu */
+    /**<summary>Pozycja X na ekranie</summary>*/
+    public int menuXPosition;
+    /**<summary>Pozycja Y na ekranie</summary>*/
+    public int menuYPosition;
+
+    /**<summary>Czy menu ma miec pozioma orientacje</summary>*/
+    public bool horizontalOrientation;
+
+    /* rozmiary przyciskow */
+    /**<summary>Szerokosc przyciskow-dzieci</summary>*/
+    public int buttonWidth;
+    /**<summary>Wysokosc przyciskow-dzieci</summary>*/
+    public int buttonHeight;
+
+    /**<summary>Odstep miedzy przyciskami</summary>*/
+    public int buttonDistance;
+    /**<summary>Kontroler nasluchujacy przyciski</summary>*/
+    public Controller listener;
+
+    /**<summary>Tablica przechowujaca informacje nt. przyciskow</summary>*/
+    Button[] buttons;
 
     /* ***********************************************************************************
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
-	public void Start()
-	{
-		int xPos = menuXPosition, yPos = menuYPosition; //pozycja aktutalnie tworzonego przycisku
-		int xHandle = 0, yHandle = 0; //modyfikatory zalezne od punktu osadzenia 
-		
-		/* ustawienie modyfikatorow */
-		switch(verticalHandle)
-		{
-		case 1: yHandle = 0; break;
-		case 0: yHandle = Screen.height / 2; break;
-		case -1: yHandle = Screen.height; break;
-		}
-		switch(horizontalHandle)
-		{
-		case 1: xHandle = Screen.width; break;
-		case 0: xHandle = Screen.width / 2; break;
-		case -1: xHandle = 0; break;
-		}
-		
-		buttons = GetComponentsInChildren<Button>();
-		for(int i = 0; i < buttons.Length; ++i)
-		{
-			if(horizontalOrientation)
-				xPos = menuXPosition + buttons[i].order * (buttonWidth + buttonDistance);
-			else
-				yPos = menuYPosition + buttons[i].order * (buttonHeight + buttonDistance);
-			
-			/* generowanie pozycji przycisku */
+    /** <summary>Funkcja przygotowujaca menu. Wywolywana na poczatku istnienia obiektu</summary> */
+    public void Start()
+    {
+        int xPos = menuXPosition, yPos = menuYPosition; //pozycja aktutalnie tworzonego przycisku
+        int xHandle = 0, yHandle = 0; //modyfikatory zalezne od punktu osadzenia 
+        
+        /* ustawienie modyfikatorow */
+        switch(verticalHandle)
+        {
+        case 1: yHandle = 0; break;
+        case 0: yHandle = Screen.height / 2; break;
+        case -1: yHandle = Screen.height; break;
+        }
+        switch(horizontalHandle)
+        {
+        case 1: xHandle = Screen.width; break;
+        case 0: xHandle = Screen.width / 2; break;
+        case -1: xHandle = 0; break;
+        }
+        
+        buttons = GetComponentsInChildren<Button>();
+        for(int i = 0; i < buttons.Length; ++i)
+        {
+            if(horizontalOrientation)
+                xPos = menuXPosition + buttons[i].order * (buttonWidth + buttonDistance);
+            else
+                yPos = menuYPosition + buttons[i].order * (buttonHeight + buttonDistance);
+            
+            /* generowanie pozycji przycisku */
             buttons[i].X = xPos + xHandle;
             buttons[i].Y = yPos + yHandle;
             buttons[i].Width = buttonWidth;
             buttons[i].Height = buttonHeight;
-		}
-	}
+        }
+    }
 }

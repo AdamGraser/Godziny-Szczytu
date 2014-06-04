@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 
-/* reprezentuje droge */
+/**<summary>Reprezentuje droge</summary>*/
 public class Road : MonoBehaviour 
 {
-    private Crossroads start; //skrzyzowanie, w ktorym droga sie rozpoczyna
+    private Crossroads start;
+    /**<summary>Skrzyzowanie rozpoczynajace te droge</summary>*/
     public Crossroads Start
     {
         set
@@ -20,7 +21,8 @@ public class Road : MonoBehaviour
         }
     }
 
-    private Crossroads end; //skrzyzowanie, w ktorym droga sie konczy
+    /**<summary>Skrzyzowanie bedace koncem tej drogi</summary>*/
+    private Crossroads end;
     public Crossroads End
     {
         set
@@ -37,8 +39,8 @@ public class Road : MonoBehaviour
         }
     }
 
-    /* pozycja logiczna. odzworowuje wspolrzedne: X i Z. bezposrednio powiazana z rzeczywista pozycja.
-     * zmiana pozycji logicznej skutkuje zmiana pozycji rzeczywistej */
+    /**<summary>Pozycja logiczna bedaca punktem srodkowym drogi. Odzworowuje wspolrzedne: X i Z. Bezposrednio powiazana z rzeczywista pozycja.
+     * Zmiana pozycji logicznej skutkuje zmiana pozycji rzeczywistej</summary> */
     public Vector2 LogicPosition
     {
         get
@@ -51,7 +53,7 @@ public class Road : MonoBehaviour
             transform.position = new Vector3(value.x, transform.position.y, value.y);
         }
     }
-    /* prawdziwa pozycja na swiecie */
+    /**<summary>Rzeczywista pozycja na swiecie</summary>*/
     public Vector3 RealPosition
     {
         set
@@ -63,14 +65,16 @@ public class Road : MonoBehaviour
         {
             return transform.position;
         }
-    } 
+    }
 
-    public float Length { get; private set; } //dlugosc drogi
+    /**<summary>Dlugosc drogi</summary>*/
+    public float Length { get; private set; }
 
     /* ***********************************************************************************
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
+    /** <summary>Funkcja przygotowujaca drogi do zabawy. Wywolywana na poczatku istnienia obiektu.</summary> */
     void Awake()
     {
         Length = 0;
@@ -80,6 +84,7 @@ public class Road : MonoBehaviour
      *                                FUNKCJE POMOCNICZE
      * *********************************************************************************** */
 
+    /**<summary>Oblicza dlugosc drogi</summary>*/
     private float CalculateLength()
     {
         return (start.LogicPosition - end.LogicPosition).magnitude;

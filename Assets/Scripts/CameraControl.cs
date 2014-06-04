@@ -1,12 +1,18 @@
 ﻿using UnityEngine;
 
-//Camera steering class
+/**<summary>Klasa oblsugujaca kontrole kamery</summary>*/
 public class CameraControl : MonoBehaviour
 {
-    public float velocity; //predkosc przemieszczania sie kamery
+    /**<summary>Predkosc przemieszczanai sie kamery</summary>*/
+    public float velocity;
+    /**<summary>Predkosc katowa (rad/s) kamery</summary>*/
     public float angularVelocity; //predkosc katowa kamery (w radianach na sekunde)
 
-    // Update is called once per frame
+    /* ***********************************************************************************
+     *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
+     * *********************************************************************************** */
+
+    /** <summary>Funkcja wywolywana podczas kazdej klatki.</summary> */
     void Update ()
     {
         /* przesun kamere */
