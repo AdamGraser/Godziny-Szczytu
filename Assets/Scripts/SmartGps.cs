@@ -6,7 +6,7 @@ using UnityEngine;
 /**<summary>Klasa reprezentujaca inteligentny GPS, bazujacy na algorytmie genetycznym</summary>*/
 public class SmartGps : Gps
 {
-    /**<summary>Klasa reprezentujaca informacje o drodze</summary>*/
+    /**<summary>Klasa reprezentujaca informacje o drodze (odcinku pomiedzy dwoma skrzyzowaniami)</summary>*/
     private class RoadInfo
     {
         /**<summary>Punkt koncowy drogi</summary>*/
@@ -18,10 +18,10 @@ public class SmartGps : Gps
         /**<summary>Ile razy przejechano</summary>*/
         public int[] howManyTimes;
 
-        /**<summary>Czy to ta sciezka</summary>
+        /**<summary>Czy to ten odcinek</summary>
          * <param name="start">Punkt poczatkowy</param>
          * <param name="end">Punkt koncowy</param>
-         * <returns>Zwraca true, jest to 'ta' sciezka. W przeciwnym wypadku - zwraca false</returns>*/
+         * <returns>Zwraca true, jest to 'ten' odcinek</returns>*/
         public bool IsThisPath(Vector2 start, Vector2 end)
         {
             bool result = false;
@@ -40,7 +40,8 @@ public class SmartGps : Gps
 
         /**<summary>Konstruktor</summary>
          * <param name="start">Punkt poczatkowy</param>
-         * <param name="end">Punkt koncowy</param>*/
+         * <param name="end">Punkt koncowy</param>
+         * <param name="roadMap">Mapa, na ktorej znajduje sie dana droga</param>*/
         public RoadInfo(Vector2 start, Vector2 end, Map roadMap)
         {
             a = start;
@@ -62,7 +63,7 @@ public class SmartGps : Gps
 
         /**<summary>Zapamietaj uzyskany czas przejazdu</summary>
          * <param name="newTime">Uzyskany czas</param>
-         * <param name="term"></param>*/
+         * <param name="term">Pora dnia wyrazona jako liczba naturalna</param>*/
         public void RememberTime(float newTime, int term)
         {
             time[term] = (time[term] * howManyTimes[term] + newTime) / (howManyTimes[term] + 1);
@@ -90,7 +91,7 @@ public class SmartGps : Gps
     /**<summary>Lista wszystkich odcinkow</summary>*/
     private List<RoadInfo> AllRoads;
 
-    /**<summary>Lista wszystkich pamietanych obecnie sciezek</summary>*/
+    /**<summary>Listy wszystkich pamietanych obecnie sciezek</summary>*/
     private List<List<Vector2>> [] AllPaths;
 
     /**<summary>Przelicza godzina na pore dnia</summary>
@@ -112,11 +113,11 @@ public class SmartGps : Gps
             return 0;
     }
 
-    /**<summary>Zwraca czas przejazdu jednego odcinka</summary>
+    /**<summary>Zwraca czas przejazdu jednego odcinka o konkretnej porze</summary>
      * <param name="a">Jeden z koncow odcinka</param>
      * <param name="b">Drugi z koncow odcinka</param>
      * <param name="term">Pora dnia przejazdu</param>
-     * <returns>Zwraca czas przejazdu podanego odcinka</returns>*/
+     * <returns>Czas przejazdu</returns>*/
     private float GetRoadTime(Vector2 a, Vector2 b, int term)
     {
         float result = 0;
@@ -131,10 +132,10 @@ public class SmartGps : Gps
         return result;
     }
 
-    /**<summary>Sprawdza, cze sciezka laczy podane wezly</summary>
-     * <param name="ListToCompare">Lista testowanych wezlow</param>
-     * <param name="start">Jeden z koncow odcinka</param>
-     * <param name="end">Drugi z koncow odcinka</param?
+    /**<summary>Sprawdza, czy podana sciezka laczy podane wezly</summary>
+     * <param name="ListToCompare">Sprawdzana sciezka</param>
+     * <param name="start">Pierwszy wezel</param>
+     * <param name="end">Ostatni wezel</param>
      * <returns>Zwraca: 0 - nie laczy; 1- laczy; 2 - laczy, ale w odwrotnej kolejnosci</returns> */
     private short CmpPaths(List<Vector2>ListToCompare, Vector2 start, Vector2 end)
     {
@@ -154,8 +155,8 @@ public class SmartGps : Gps
     }
 
     /**<summary>Funkcja krzyzujaca dwie sciezki</summary>
-     * <param name="parent1">Sciezka</param>
-     * <param name="parent2">Sciezka</param>
+     * <param name="parent1">Pierwsza sciezka</param>
+     * <param name="parent2">Druga sciezka</param>
      * <returns>Zwraca skrzyzowana sciezke lub null, jesli sciezki nie sa mozliwe do skrzyzowania</returns>*/
     public List<Vector2> Crossbreed(List<Vector2> parent1, List<Vector2> parent2)
     {
@@ -223,8 +224,11 @@ public class SmartGps : Gps
 
         return child;
     }
-
-    //Funkcja wybijajaca najslabsze osobniki sposrod sciezek laczacych dwa podane wezly
+    
+    /**<summary>Funkcja wybijajaca najslabsze osobniki sposrod sciezek laczacych dwa podane wezly (zostaje zawsze stala liczba sciezek).</summary>
+     * <param name="a">Pierwszy wezel</param>
+     * <param name="b">Drugi wezel</param>
+     * <param name="term">Pora dnia</param> */
     private void Select(Vector2 a, Vector2 b, int term)
     {
         List<int> indexes = new List<int>();
@@ -287,7 +291,8 @@ public class SmartGps : Gps
 
     }
 
-    //Funkcja mutujaca
+    /**<summary>Funkcja mutujaca sciezke (zastepuje jej fragment innym mozliwym, losowym polaczeniem).</summary>
+     * <param name="pth">Sciezka do zmutowania</param> */
     private void Mutate(List<Vector2> pth)
     {
         int mutstart, mutend;
@@ -302,6 +307,8 @@ public class SmartGps : Gps
         pth.InsertRange(mutstart, newFragment);
     }
 
+    /**<summary>Tworzy kolejne pokolenie algortmu genetycznego.</summary>
+     * <param name="term">Pora dnia, dla ktorej ma byc utworzone kolejne pokolenie</param> */
     private void Generation(int term)
     {
         int i, j;
@@ -341,6 +348,7 @@ public class SmartGps : Gps
 
     }
 
+    /**<summary>Tworzy kolejne pokolenie algortmu genetycznego dla wszystkich por dnia.</summary> */
     private void StartGeneration()
     {
         int i;
@@ -349,8 +357,11 @@ public class SmartGps : Gps
             Generation(i);
         }
     }
-
-    //Zwraca czas przejazdu calej sciezki
+    
+    /**<summary>Zwraca szacowany czas przejazdu calej sciezki o danej porze dnia</summary>
+     * <param name="Path">Sciezka</param>
+     * <param name="term">Pora dnia</param>
+     * <returns>Szacowany czas przejazdu</returns>*/
     private float GetPathTime(List<Vector2> Path, int term)
     {
         float result = 0;
@@ -361,8 +372,12 @@ public class SmartGps : Gps
         }
         return result;
     }
-
-    //Zdajduje losowa sciezke pomiedzy danymi wezlami
+    
+    /**<summary>Zdajduje losowa sciezke pomiedzy danymi wezlami</summary>
+     * <param name="start">Punkt poczatkowy</param>
+     * <param name="end">Punkt koncowy</param>
+     * <param name="bannedCrossroads">Lista wezlow, przez ktore nie moze przebiegac sciezka (może być null)</param>
+     * <returns>Losowa sciezke laczaca podane punkty</returns>*/
     private List<Vector2> RandomPath(Vector2 start, Vector2 end, List<Vector2> bannedCrossroads)
     {
         List<Crossroads> neighbours = new List<Crossroads>();
@@ -418,6 +433,8 @@ public class SmartGps : Gps
         return result;
     }
 
+    /**<summary>Funkcja rekurencyjna sluzaca do wyszukiwania wszystkich istniejacych odcinkow</summary>
+     * <param name="from">Wezel, z ktorego szukamy odcinkow wychodzacych</param> */
     private void ReverseRoadSearcher(Vector2 from)
     {
         foreach (var nb in MyMap.AllCrossroads[from].ConnectedCrossroads)
@@ -440,6 +457,11 @@ public class SmartGps : Gps
         }
     }
 
+    /**<summary>Znajduje najlepsza sciezke z tych, ktore zostaly wylonone w algorytmie genetycznym.</summary>
+     * <param name="a">Pierwszy wezel</param>
+     * <param name="b">Drugi wezel</param>
+     * <param name="term">Pora dnia</param>
+     * <returns>Najszybsza znana sciezke</returns>*/
     private List<Vector2> FindBestPath(Vector2 start, Vector2 end, int term)
     {
         List<Vector2> best = null;
@@ -479,7 +501,8 @@ public class SmartGps : Gps
         return best;
     }
 
-    //Ladowanie mapy
+    /**<summary>Ladowanie mapy.</summary>
+     * <param name="mapToLoad">Mapa do zaladowania</param> */
     override public void LoadMap(Map mapToLoad)
     {
         // Komora maszyny losujacej jest pusta...
@@ -528,11 +551,12 @@ public class SmartGps : Gps
         StartGeneration();
     }
 
-    // Zapamietuje czas przejazdu po danym odcinku
-    // start, end - poczatek i koniec odcinka
-    // time - czas przejazdu odcinka
-    // hour - godzina przejazdu (0-23)
-    // endOfPath - czy to byl ostatni odcinek w sciezce (jesli tak, trzeba zrobic kolejne pokolenie)
+    /**<summary>Zapamietuje czas przejazdu po danym odcinku</summary>
+     * <param name="start">Poczatek odcinka</param>
+     * <param name="end">Koniec odcinka</param>
+     * <param name ="time">Czas przejazdu odcinka</param>
+     * <param name ="hour">Godzina przejazdu (0-23)</param>
+     * <param name ="time">endOfPath - czy to byl ostatni odcinek w sciezce (jesli tak, trzeba zrobic kolejne pokolenie)</param> */
     public void RememberTime(Vector2 start, Vector2 end, float time, int hour, bool endOfPath)
     {
         foreach (RoadInfo ri in AllRoads)
@@ -551,7 +575,11 @@ public class SmartGps : Gps
         }
     }
 
-    // Tu bedzie inteligentny algorytm
+    /**<summary>Znajduje sciezke laczaca dane wezly.</summary>
+     * <param name="a">Pierwszy wezel</param>
+     * <param name="b">Drugi wezel</param>
+     * <param name ="hour">Godzina przejazdu (0-23)</param>
+     * <returns>Sciezka</returns> */
     public List<Vector2> FindPath(Vector2 start, Vector2 end, int hour)
     {
         return FindBestPath(start, end, HourToTerm(hour));
@@ -560,6 +588,9 @@ public class SmartGps : Gps
     /* ***********************************************************************************
      *                   FUNKCJE ZWIAZANE Z ZAPISEM I ODCZYTEM Z PLIKU
      * *********************************************************************************** */
+
+    /**<summary>Zapisuje dane dotyczace inteligencji do pliku.</summary>
+     * <param name="Stream">Strumien, do ktorego beda zapisane dane.</param> */
     public void SaveToFile(FileStream Stream)
     {
         int i, j;
@@ -595,6 +626,10 @@ public class SmartGps : Gps
         }
     }
 
+    /**<summary>Wczytuje dane dotyczace inteligencji z pliku.</summary>
+     * <param name="Stream">Strumien, do ktorego beda zapisane dane.</param>
+     * <param name="NewMap">Mapa, ktorej dotycza dane wczytane z pliku</param>
+     * <remarks>W przypadku użycia tej funkcji nie należy wywoływać już funkcji LoadMap.</remarks> */
     public void LoadFromFile(FileStream Stream, Map NewMap)
     {
         int i, j, k;

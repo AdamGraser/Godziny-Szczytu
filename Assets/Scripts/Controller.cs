@@ -10,7 +10,7 @@ public class Controller : MonoBehaviour
     /* zdarzenia */
     private delegate void ActionDelegate();
     /**<summary>Aktywna akcja, ktora ma byc wykonywana</summary>*/
-    private ActionDelegate activeAction;
+    private ActionDelegate activeAction; 
     /**<summary>Czy akcja ma byc wykonywana w ciagle, czy tylko raz</summary>*/
     private bool isActionContinous;
 
@@ -920,10 +920,18 @@ public class Controller : MonoBehaviour
     /**<summary>Ustaiwa podana akcje jako aktywna</summary>
      * <param name="action">Akcja, ktora ma byc wykonywana</param>
      * <param name="isContinous">Czy akcja ma byc ciagla</param>*/
-    private void SetActiveAction(ActionDelegate action, bool isContinous = false)
+    private void SetActiveAction(ActionDelegate action, bool isContinous)
     {
         activeAction = action;
         isActionContinous = isContinous;
+    }
+
+    /**<summary>Ustaiwa podana akcje jednorazowa jako aktywna</summary>
+     * <param name="action">Akcja, ktora ma byc wykonywana</param>*/
+    private void SetActiveAction(ActionDelegate action)
+    {
+        activeAction = action;
+        isActionContinous = false;
     }
 
     /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla konkretnych dzialan*/
