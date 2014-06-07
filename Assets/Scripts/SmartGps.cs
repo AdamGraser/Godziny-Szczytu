@@ -14,7 +14,7 @@ public class SmartGps : Gps
         /**<summary>Drugi punkt koncowy drogi</summary>*/
         public Vector2 b;
         /**<summary>Czasy osiagniete na danej drodze</summary>*/
-        public float [] time;
+        public float[] time;
         /**<summary>Ile razy przejechano</summary>*/
         public int[] howManyTimes;
 
@@ -26,11 +26,11 @@ public class SmartGps : Gps
         {
             bool result = false;
 
-            if ((a == start) && (b == end))
+            if((a == start) && (b == end))
             {
                 result = true;
             }
-            else if ((b == start) && (a == end))
+            else if((b == start) && (a == end))
             {
                 result = true;
             }
@@ -47,13 +47,13 @@ public class SmartGps : Gps
             a = start;
             b = end;
 
-            List<float> timeTemp = new List<float> ();
+            List<float> timeTemp = new List<float>();
             List<int> howManyTimesTemp = new List<int>();
 
             int i;
-            for (i = 0; i < Lt; ++i)
+            for(i = 0; i < Lt; ++i)
             {
-                timeTemp.Add(roadMap.AllRoads[(a+b)/2f].Length / InitialSpeed); // Predkosc do ustalenia
+                timeTemp.Add(roadMap.AllRoads[(a + b) / 2f].Length / InitialSpeed); // Predkosc do ustalenia
                 howManyTimesTemp.Add(0);
             }
 
@@ -77,7 +77,7 @@ public class SmartGps : Gps
     private static int Mp = 10;
 
     /**<summary>Predkosc teoretyczna (w przypadku braku korkow)</summary>*/
-    private static int InitialSpeed = 10;
+    private static int InitialSpeed = 3;
     /**<summary>Ilosc okresow dnia</summary>*/
     private static int Lt = 6;
 
@@ -92,22 +92,22 @@ public class SmartGps : Gps
     private List<RoadInfo> AllRoads;
 
     /**<summary>Listy wszystkich pamietanych obecnie sciezek</summary>*/
-    private List<List<Vector2>> [] AllPaths;
+    private List<List<Vector2>>[] AllPaths;
 
     /**<summary>Przelicza godzina na pore dnia</summary>
      * <param name="hour">Godzina</param>
      * <returns>Zwraca uzyskana z godziny pore dnia</returns>*/
     private int HourToTerm(int hour)
     {
-        if ((hour >= 5) && (hour <= 7)) // rano
+        if((hour >= 5) && (hour <= 7)) // rano
             return 1;
-        else if ((hour >= 8) && (hour <= 10)) // do poludnia
+        else if((hour >= 8) && (hour <= 10)) // do poludnia
             return 2;
-        else if ((hour >= 11) && (hour <= 13)) // poludnie
+        else if((hour >= 11) && (hour <= 13)) // poludnie
             return 3;
-        else if ((hour >= 14) && (hour <= 17)) // po poludniu
+        else if((hour >= 14) && (hour <= 17)) // po poludniu
             return 4;
-        else if ((hour >= 18) && (hour <= 22)) // wieczor
+        else if((hour >= 18) && (hour <= 22)) // wieczor
             return 5;
         else // noc
             return 0;
@@ -121,9 +121,9 @@ public class SmartGps : Gps
     private float GetRoadTime(Vector2 a, Vector2 b, int term)
     {
         float result = 0;
-        foreach (RoadInfo ri in AllRoads)
+        foreach(RoadInfo ri in AllRoads)
         {
-            if (ri.IsThisPath(a, b))
+            if(ri.IsThisPath(a, b))
             {
                 result = ri.time[term];
                 break;
@@ -137,16 +137,16 @@ public class SmartGps : Gps
      * <param name="start">Pierwszy wezel</param>
      * <param name="end">Ostatni wezel</param>
      * <returns>Zwraca: 0 - nie laczy; 1- laczy; 2 - laczy, ale w odwrotnej kolejnosci</returns> */
-    private short CmpPaths(List<Vector2>ListToCompare, Vector2 start, Vector2 end)
+    private short CmpPaths(List<Vector2> ListToCompare, Vector2 start, Vector2 end)
     {
         short result = 0;
 
-        if ((ListToCompare[0] == start) && (ListToCompare[ListToCompare.Count - 1] == end))
+        if((ListToCompare[0] == start) && (ListToCompare[ListToCompare.Count - 1] == end))
         {
             result = 1;
         }
-        
-        if ((ListToCompare[0] == end) && (ListToCompare[ListToCompare.Count - 1] == start))
+
+        if((ListToCompare[0] == end) && (ListToCompare[ListToCompare.Count - 1] == start))
         {
             result = 2;
         }
@@ -164,19 +164,19 @@ public class SmartGps : Gps
 
         int indexP1 = 0; // Polozenie wezla krzyzujacego u pierwszego rodzica
         int indexP2 = 0; // Polozenie wezla krzyzujacego u pierwszego rodzica
-        int bestLocation = int.MaxValue; 
+        int bestLocation = int.MaxValue;
         int thisLocation; // Wskaznik "srednosci" polozenia wezlow
         int i, j;
 
         //Szukanie wezla krzyzujacego
-        for (i = 0; i < parent1.Count; ++i)
+        for(i = 0; i < parent1.Count; ++i)
         {
-            for (j = 0; j < parent2.Count; ++j)
+            for(j = 0; j < parent2.Count; ++j)
             {
-                if (parent1[i] == parent2[j])
+                if(parent1[i] == parent2[j])
                 {
                     thisLocation = Math.Abs(parent1.Count + parent2.Count - (i + j + 2) * 2);
-                    if (thisLocation<bestLocation)
+                    if(thisLocation < bestLocation)
                     {
                         indexP1 = i;
                         indexP2 = j;
@@ -187,15 +187,15 @@ public class SmartGps : Gps
         }
 
         //Krzyzowanie (jesli mozliwe)
-        if ((indexP1 != 0) || (indexP2 != 0))
+        if((indexP1 != 0) || (indexP2 != 0))
         {
             child = new List<Vector2>();
-            if (parent1[0] != parent2[parent2.Count - 1]) // poczatek pierwszego, koniec drugiego
+            if(parent1[0] != parent2[parent2.Count - 1]) // poczatek pierwszego, koniec drugiego
             {
                 child.AddRange(parent1.GetRange(0, indexP1));
                 child.AddRange(parent2.GetRange(indexP2, parent2.Count - indexP2));
             }
-            else if (parent2[0] != parent1[parent1.Count - 1]) // poczatek drugiego, koniec pierwszego
+            else if(parent2[0] != parent1[parent1.Count - 1]) // poczatek drugiego, koniec pierwszego
             {
                 child.AddRange(parent2.GetRange(0, indexP2));
                 child.AddRange(parent1.GetRange(indexP1, parent1.Count - indexP1));
@@ -203,18 +203,18 @@ public class SmartGps : Gps
             else // oba poczatki
             {
                 child.AddRange(parent1.GetRange(0, indexP1));
-                for (i = indexP2; i >= 0; --i)
+                for(i = indexP2; i >= 0; --i)
                 {
                     child.Add(parent2[i]);
                 }
             }
 
             //Wyciecie "petelek"
-            for (i = 0; i < (child.Count - 1); ++i)
+            for(i = 0; i < (child.Count - 1); ++i)
             {
-                for (j = i + 1; j < child.Count; ++j)
+                for(j = i + 1; j < child.Count; ++j)
                 {
-                    if (child[i] == child[j])
+                    if(child[i] == child[j])
                     {
                         child.RemoveRange(i, j - i);
                     }
@@ -224,7 +224,7 @@ public class SmartGps : Gps
 
         return child;
     }
-    
+
     /**<summary>Funkcja wybijajaca najslabsze osobniki sposrod sciezek laczacych dwa podane wezly (zostaje zawsze stala liczba sciezek).</summary>
      * <param name="a">Pierwszy wezel</param>
      * <param name="b">Drugi wezel</param>
@@ -238,55 +238,58 @@ public class SmartGps : Gps
         float tempTime;
 
         //Wyszukanie sciezek, ktorych dotyczy proces selekcji
-        for (i = 0; i<AllPaths[term].Count; ++i)
+        for(i = 0; i < AllPaths[term].Count; ++i)
         {
-            if (CmpPaths(AllPaths[term][i], a, b) != 0)
+            if(CmpPaths(AllPaths[term][i], a, b) != 0)
             {
                 indexes.Add(i);
                 times.Add(GetPathTime(AllPaths[term][i], term));
             }
         }
 
-        //Posortowanie sciezek rosnaco wg czasow (sortowanie przez proste wstawianie)
-        for (i = 1; i < indexes.Count; ++i)
+        if(indexes.Count > Ls)
         {
-            if (times[i] < times[i - 1]) // Jesli czas jest mniejszy od czasu poprzednika, trzeba przestawiac
+            //Posortowanie sciezek rosnaco wg czasow (sortowanie przez proste wstawianie)
+            for(i = 1; i < indexes.Count; ++i)
             {
-                tempIndex = indexes[i];
-                tempTime = times[i];
-                indexes.RemoveAt(i);
-                times.RemoveAt(i);
+                if(times[i] < times[i - 1]) // Jesli czas jest mniejszy od czasu poprzednika, trzeba przestawiac
+                {
+                    tempIndex = indexes[i];
+                    tempTime = times[i];
+                    indexes.RemoveAt(i);
+                    times.RemoveAt(i);
 
-                for (j = 0; times[j] < tempTime; ++j)
-                { }; // Szukanie miejsca do wstawienia elementu
+                    for(j = 0; times[j] < tempTime; ++j)
+                    { }; // Szukanie miejsca do wstawienia elementu
 
-                indexes.Insert(j, tempIndex);
-                times.Insert(j ,tempTime);
+                    indexes.Insert(j, tempIndex);
+                    times.Insert(j, tempTime);
+                }
             }
-        }
 
-        //Wziecie indeksow sciezek do odstrzalu
-        indexes = indexes.GetRange(Ls, indexes.Count - Ls);
+            //Wziecie indeksow sciezek do odstrzalu
+            indexes = indexes.GetRange(Ls, indexes.Count - Ls);
 
-        //Posortowanie indeksow malejaco
-        for (i = 1; i < indexes.Count; ++i)
-        {
-            if (indexes[i] > indexes[i - 1]) // Jesli czas jest mniejszy od czasu poprzednika, trzeba przestawiac
+            //Posortowanie indeksow malejaco
+            for(i = 1; i < indexes.Count; ++i)
             {
-                tempIndex = indexes[i];
-                indexes.RemoveAt(i);
+                if(indexes[i] > indexes[i - 1]) // Jesli czas jest mniejszy od czasu poprzednika, trzeba przestawiac
+                {
+                    tempIndex = indexes[i];
+                    indexes.RemoveAt(i);
 
-                for (j = 0; indexes[j] > tempIndex; ++j)
-                { }; // Szukanie miejsca do wstawienia elementu
+                    for(j = 0; indexes[j] > tempIndex; ++j)
+                    { }; // Szukanie miejsca do wstawienia elementu
 
-                indexes.Insert(j, tempIndex);
+                    indexes.Insert(j, tempIndex);
+                }
             }
-        }
 
-        //Egzekucja
-        for (i = 0; i < indexes.Count; ++i)
-        {
-            AllPaths[term].RemoveAt(indexes[i]);
+            //Egzekucja
+            for(i = 0; i < indexes.Count; ++i)
+            {
+                AllPaths[term].RemoveAt(indexes[i]);
+            }
         }
 
     }
@@ -297,7 +300,7 @@ public class SmartGps : Gps
     {
         int mutstart, mutend;
         mutstart = rand.Next(pth.Count - 1);
-        mutend = rand.Next(mutstart+1, pth.Count-1);
+        mutend = rand.Next(mutstart + 1, pth.Count - 1);
 
         Vector2 start = pth[mutstart];
         Vector2 end = pth[mutend];
@@ -316,11 +319,11 @@ public class SmartGps : Gps
         List<Vector2> newPath;
 
         //Krzyzowanie
-        for (i = 1; i < stop; ++i)
+        for(i = 1; i < stop; ++i)
         {
             //Donienie nowej sciezki bedacej krzyzowka poprzednich
             newPath = Crossbreed(AllPaths[term][i], AllPaths[term][i - 1]);
-            if (newPath != null)
+            if(newPath != null)
             {
                 AllPaths[term].Add(newPath);
             }
@@ -328,9 +331,9 @@ public class SmartGps : Gps
 
         //Selekcja
         stop = AllCrossroads.Count;
-        for (i = 0; i < stop-1; ++i)
+        for(i = 0; i < stop - 1; ++i)
         {
-            for (j = i + 1; j < stop; ++j)
+            for(j = i + 1; j < stop; ++j)
             {
                 Select(AllCrossroads[i], AllCrossroads[j], term);
             }
@@ -340,7 +343,7 @@ public class SmartGps : Gps
         j = 100 / Mp; // Co ktora sciezka zostanie zmutowana
         i = rand.Next(j);
         stop = AllCrossroads.Count;
-        while (i < stop)
+        while(i < stop)
         {
             Mutate(AllPaths[term][i]);
             i += j;
@@ -352,12 +355,12 @@ public class SmartGps : Gps
     private void StartGeneration()
     {
         int i;
-        for (i = 0; i < Lt; ++i)
+        for(i = 0; i < Lt; ++i)
         {
             Generation(i);
         }
     }
-    
+
     /**<summary>Zwraca szacowany czas przejazdu calej sciezki o danej porze dnia</summary>
      * <param name="Path">Sciezka</param>
      * <param name="term">Pora dnia</param>
@@ -366,13 +369,13 @@ public class SmartGps : Gps
     {
         float result = 0;
         int i;
-        for (i = 1; i < Path.Count; ++i)
+        for(i = 1; i < Path.Count; ++i)
         {
             result += GetRoadTime(Path[i - 1], Path[i], term);
         }
         return result;
     }
-    
+
     /**<summary>Zdajduje losowa sciezke pomiedzy danymi wezlami</summary>
      * <param name="start">Punkt poczatkowy</param>
      * <param name="end">Punkt koncowy</param>
@@ -393,18 +396,24 @@ public class SmartGps : Gps
         List<Vector2> newBannedCrossroads = new List<Vector2>();
         newBannedCrossroads.Add(start);
 
-        
-        if (bannedCrossroads != null)
+
+        if(bannedCrossroads != null)
         {
             newBannedCrossroads.AddRange(bannedCrossroads);
         }
 
-        while (true)
+        while(true)
         {
-            randomNeighbour = neighbours[neighbourIndex].LogicPosition;
-            if (!newBannedCrossroads.Contains(randomNeighbour)) // Sprawdzamy, czy element juz nie nalezy do sciezki
+
+            if(neighbourIndex >= neighbours.Count)
             {
-                if (randomNeighbour == end) // Sprawdzamy, czy nie dotarlismy do celu
+                break;
+            }
+
+            randomNeighbour = neighbours[neighbourIndex].LogicPosition;
+            if(!newBannedCrossroads.Contains(randomNeighbour)) // Sprawdzamy, czy element juz nie nalezy do sciezki
+            {
+                if(randomNeighbour == end) // Sprawdzamy, czy nie dotarlismy do celu
                 {
                     result = new List<Vector2>();
                     result.Add(start);
@@ -415,7 +424,7 @@ public class SmartGps : Gps
                 {
                     result = RandomPath(randomNeighbour, end, newBannedCrossroads);
 
-                    if (result != null) // Znaleziono sciezke do celu!
+                    if(result != null) // Znaleziono sciezke do celu!
                     {
                         result.Insert(0, start);
                         break;
@@ -425,10 +434,10 @@ public class SmartGps : Gps
 
             // Przejscie do kolejnego sasiada - jesli jakis niesprawdzony jeszcze istnieje
             neighbourIndex = (neighbourIndex + 1) % neighbours.Count;
-            if (neighbourIndex == randValue)
+            if(neighbourIndex == randValue)
                 break;
         }
-    
+
 
         return result;
     }
@@ -437,19 +446,19 @@ public class SmartGps : Gps
      * <param name="from">Wezel, z ktorego szukamy odcinkow wychodzacych</param> */
     private void ReverseRoadSearcher(Vector2 from)
     {
-        foreach (var nb in MyMap.AllCrossroads[from].ConnectedCrossroads)
+        foreach(var nb in MyMap.AllCrossroads[from].ConnectedCrossroads)
         {
             //Sprawdzanie, czy taka droga jest juz na liscie
             bool exists = false;
-            foreach (RoadInfo ri in AllRoads)
+            foreach(RoadInfo ri in AllRoads)
             {
-                if (ri.IsThisPath(from, nb.Value.LogicPosition))
+                if(ri.IsThisPath(from, nb.Value.LogicPosition))
                 {
                     exists = true;
                 }
             }
 
-            if (exists == false)
+            if(exists == false)
             {
                 AllRoads.Add(new RoadInfo(from, nb.Value.LogicPosition, MyMap));
                 ReverseRoadSearcher(nb.Value.LogicPosition);
@@ -458,8 +467,8 @@ public class SmartGps : Gps
     }
 
     /**<summary>Znajduje najlepsza sciezke z tych, ktore zostaly wylonone w algorytmie genetycznym.</summary>
-     * <param name="a">Pierwszy wezel</param>
-     * <param name="b">Drugi wezel</param>
+     * <param name="start">Pierwszy wezel</param>
+     * <param name="end">Drugi wezel</param>
      * <param name="term">Pora dnia</param>
      * <returns>Najszybsza znana sciezke</returns>*/
     private List<Vector2> FindBestPath(Vector2 start, Vector2 end, int term)
@@ -470,17 +479,17 @@ public class SmartGps : Gps
         short cmpResult;
         int debug = 0;
 
-        foreach (List<Vector2> pth in AllPaths[term])
+        foreach(List<Vector2> pth in AllPaths[term])
         {
             cmpResult = CmpPaths(pth, start, end);
-            if (cmpResult != 0)
+            if(cmpResult != 0)
             {
                 ++debug;
                 time = GetPathTime(pth, term);
-                if (time < bestTime)
+                if(time < bestTime)
                 {
                     bestTime = time;
-                    if (cmpResult == 1)
+                    if(cmpResult == 1)
                     {
                         best = pth;
                     }
@@ -489,7 +498,7 @@ public class SmartGps : Gps
                         //Odwrocenie sciezki
                         best = new List<Vector2>();
                         int i;
-                        for (i = pth.Count; i > 0; --i)
+                        for(i = pth.Count; i > 0; --i)
                         {
                             best.Add(pth[i - 1]);
                         }
@@ -497,7 +506,7 @@ public class SmartGps : Gps
                 }
             }
         }
-        
+
         return best;
     }
 
@@ -506,35 +515,40 @@ public class SmartGps : Gps
     override public void LoadMap(Map mapToLoad)
     {
         // Komora maszyny losujacej jest pusta...
-        rand = new System.Random(); 
+        rand = new System.Random();
 
         // Ladowanie skrzyzowan
         MyMap = mapToLoad;
         AllCrossroads = new List<Vector2>();
         foreach(var c in MyMap.AllCrossroads)
             AllCrossroads.Add(c.Value.LogicPosition);
-            
+
         //numberOfCrossroads = AllCrossroads.Count;
 
         int i, j, k;
 
         // Ladowanie sciezek
         List<List<Vector2>> AllPathsTemp = new List<List<Vector2>>();
+        List<Vector2> RandPth;
 
-        for (i = 0; i < (AllCrossroads.Count - 1); ++i)
+        for(i = 0; i < (AllCrossroads.Count - 1); ++i)
         {
-            for (j = i + 1; j < AllCrossroads.Count; ++j)
+            for(j = i + 1; j < AllCrossroads.Count; ++j)
             {
                 //Znajdywanie kilku losowych sciezek pomiedzy wezlami "i" i "j"
-                for (k = 0; k < Ls; k++)
+                for(k = 0; k < Ls; k++)
                 {
-                    AllPathsTemp.Add(RandomPath(AllCrossroads[i], AllCrossroads[j], null));
+                    RandPth = RandomPath(AllCrossroads[i], AllCrossroads[j], null);
+                    if(RandPth != null)
+                    {
+                        AllPathsTemp.Add(RandomPath(AllCrossroads[i], AllCrossroads[j], null));
+                    }
                 }
             }
         }
 
         List<List<List<Vector2>>> AllPathsStart = new List<List<List<Vector2>>>();
-        for (i = 0; i < Lt; ++i)
+        for(i = 0; i < Lt; ++i)
         {
             // Kopia poczatkowej listy dla kazdego przedzialu czasu
             AllPathsStart.Add(new List<List<Vector2>>(AllPathsTemp));
@@ -556,19 +570,19 @@ public class SmartGps : Gps
      * <param name="end">Koniec odcinka</param>
      * <param name ="time">Czas przejazdu odcinka</param>
      * <param name ="hour">Godzina przejazdu (0-23)</param>
-     * <param name ="time">endOfPath - czy to byl ostatni odcinek w sciezce (jesli tak, trzeba zrobic kolejne pokolenie)</param> */
+     * <param name ="endOfPath">endOfPath - czy to byl ostatni odcinek w sciezce (jesli tak, trzeba zrobic kolejne pokolenie)</param> */
     public void RememberTime(Vector2 start, Vector2 end, float time, int hour, bool endOfPath)
     {
-        foreach (RoadInfo ri in AllRoads)
+        foreach(RoadInfo ri in AllRoads)
         {
-            if (ri.IsThisPath(start, end))
+            if(ri.IsThisPath(start, end))
             {
                 ri.RememberTime(time, HourToTerm(hour));
                 break;
             }
         }
 
-        if (endOfPath)
+        if(endOfPath)
         {
             Generation(HourToTerm(hour));
             Generation(HourToTerm(hour));
@@ -576,8 +590,8 @@ public class SmartGps : Gps
     }
 
     /**<summary>Znajduje sciezke laczaca dane wezly.</summary>
-     * <param name="a">Pierwszy wezel</param>
-     * <param name="b">Drugi wezel</param>
+     * <param name="start">Pierwszy wezel</param>
+     * <param name="end">Drugi wezel</param>
      * <param name ="hour">Godzina przejazdu (0-23)</param>
      * <returns>Sciezka</returns> */
     public List<Vector2> FindPath(Vector2 start, Vector2 end, int hour)

@@ -94,7 +94,7 @@ public class GUI : MonoBehaviour
     
     /** <summary>Tworzy zanikajaca wiadomosc</summary> 
      * <param name="text">Tresc wiadomosci</param>
-     * <param name-"width">Szerokosc kontrolki z wiadomoscia</param>
+     * <param name="width">Szerokosc kontrolki z wiadomoscia</param>
      * <param name="height">Wysokosc kontrolki z wiadomoscia</param>
      * <param name="duration">Czas trwania wiadomosci</param>*/
     public void ShowFadingBox(string text, float width, float height, float duration)

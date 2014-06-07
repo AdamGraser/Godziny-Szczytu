@@ -21,8 +21,8 @@ public class Road : MonoBehaviour
         }
     }
 
-    /**<summary>Skrzyzowanie bedace koncem tej drogi</summary>*/
     private Crossroads end;
+    /**<summary>Skrzyzowanie bedace koncem tej drogi</summary>*/
     public Crossroads End
     {
         set

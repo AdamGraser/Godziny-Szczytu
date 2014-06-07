@@ -4,18 +4,18 @@ using UnityEngine;
 /**<summary>Klasa przechowujaca informacje nt. skrzyzowan i drog</summary> */
 public class Map : MonoBehaviour
 {
-    /**<summary>Prefab skrzyzowania</summary>*/
+    /**<value>Prefab skrzyzowania</value>*/
     public GameObject crossroadsPrefab;
-    /**<summary>Prefab drogi</summary>*/
+    /**<value>Prefab drogi</value>*/
     public GameObject roadPrefab;
 
     private Dictionary<Vector2, Crossroads> crossroads;
-    /**<summary>Zbior skrzyzowan. Kluczem jest ich logiczna pozycja</summary>*/
+    /**<value>Zbior skrzyzowan. Kluczem jest ich logiczna pozycja</value>*/
     public Dictionary<Vector2, Crossroads> AllCrossroads { get { return crossroads; } } 
 
     private Dictionary<Vector2, Road> roads;
-    /**<summary>Zbior drog. Kluczem jest isc srodkowy punkt</summary>*/
-    public Dictionary<Vector2, Road> AllRoads { get { return roads; } }
+    /**<value>Zbior drog. Kluczem jest isc srodkowy punkt</value>*/
+    public Dictionary<Vector2, Road> AllRoads { get { return roads; } } 
 
     /* ***********************************************************************************
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
@@ -146,8 +146,8 @@ public class Map : MonoBehaviour
      * *********************************************************************************** */
 
     /**<summary>Szuka drogi zawierajacaej podany punkt.</summary>
-     <param name="point">Testowany punkt</param>
-     <returns>Zwraca referencje do drogi, jesli taka zostala znaleziona. W przeciwnym wypadku zwraca null</returns>*/
+     * <param name="point">Testowany punkt</param>
+     * <returns>Zwraca referencje do drogi, jesli taka zostala znaleziona. W przeciwnym wypadku zwraca null</returns>*/
     public Road FindRoadContainingPoint(Vector2 point)
     {
         foreach(var r in roads)

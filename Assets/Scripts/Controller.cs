@@ -676,7 +676,7 @@ public class Controller : MonoBehaviour
 
     /**<summary>Generuje Agenta S na podstawie danych z pliku</summary>
      * <param name="content">Odczytana zawartosc pliku zrodlowego</param>
-     * <returns>Zwraca referencej do utworzonego Agenta S lub null, jesli agent nie zostal stworzony*/
+     * <returns>Zwraca referencej do utworzonego Agenta S lub null, jesli agent nie zostal stworzony</returns>*/
     private AgentS GenerateAgentS(SimulationFileContent content)
     {
         AgentS agent = null;
@@ -704,7 +704,7 @@ public class Controller : MonoBehaviour
 
     /**<summary>Tworzy skrzyzowanie na podanej pozycji (jezeli wczesniej nie istnialo) i zwraca referencje do niego.</summary>
      * <param name="pos">Pozycja docelowa skrzyzowania</param>
-     * <returns>Jezeli skrzyzowanie juz wczesniej istnialo, zwraca referencje do juz istniejacego skrzyzowania o pozycji pos */
+     * <returns>Jezeli skrzyzowanie juz wczesniej istnialo, zwraca referencje do juz istniejacego skrzyzowania o pozycji pos</returns> */
     private Crossroads CreateCrossoadOnPosition(Vector2 pos)
     {
         Crossroads cross;
@@ -733,8 +733,8 @@ public class Controller : MonoBehaviour
     }
 
     /**<summary>sprawdza, czy mozna polaczyc ze soba podane skrzyzowania</summary>
-     * <param name="c1">Testowane skrzyzowanie
-     * <param name="c2">Testowane skrzyzowanie
+     * <param name="c1">Testowane skrzyzowanie</param>
+     * <param name="c2">Testowane skrzyzowanie</param>
      * <returns>true - jesli skrzyzowania moga byc ze soba polaczone. W przeciwnym wypadku zwraca false</returns>*/
     private bool CanBeConnected(Crossroads c1, Crossroads c2)
     {
@@ -851,7 +851,7 @@ public class Controller : MonoBehaviour
 
     /**<summary>Dodaje Agent D do symulacji</summary>
      * <param name="home">Dom agenta</param>
-     * <param name="work"Miejsce pracy agenta</param>*/
+     * <param name="work">Miejsce pracy agenta</param>*/
     private void SpawnAgentD(Crossroads home, Crossroads work)
     {
         GameObject agentObject = (GameObject)Instantiate(agentDPrefab);
@@ -934,7 +934,7 @@ public class Controller : MonoBehaviour
         isActionContinous = false;
     }
 
-    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla konkretnych dzialan*/
+    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla konkretnych dzialan</summary>*/
     private void DeactivateAllObjects()
     {
         DeactivateRoadObjects();
@@ -942,20 +942,20 @@ public class Controller : MonoBehaviour
         DeactivateAgentObjects();
     }
 
-    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych z drogami*/
+    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych z drogami</summary>*/
     private void DeactivateRoadObjects()
     {
         possibleRoadDirections.SetActive(false);
         grid.SetActive(false);
     }
 
-    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych ze strefami*/
+    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych ze strefami</summary>*/
     private void DeactivateRegionObjects()
     {
         ClearRegionSigns();
     }
 
-    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych z agentami*/
+    /**<summary>Deaktywuje wszystkie obiekty, ktore sa tworzone dla akcji zwiazanych z agentami</summary>*/
     private void DeactivateAgentObjects()
     {
         agentSHomeSign.SetActive(false);

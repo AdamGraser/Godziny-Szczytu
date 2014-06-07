@@ -36,7 +36,7 @@ public class Button : MonoBehaviour
         method = listener.GetType().GetMethod(methodName);
     }
 
-    /**<summary>Funkcja rysujaca kontrolke</summary*/
+    /**<summary>Funkcja rysujaca kontrolke</summary>*/
     void OnGUI()
     {
         if(UnityEngine.GUI.Button(new Rect(rect.x, rect.y, rect.width, rect.height), new GUIContent(icon)))

@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['realposition',['RealPosition',['../class_crossroads.html#a65dc31e158668da77df8d82a0f4bbe5a',1,'Crossroads.RealPosition()'],['../class_road.html#aa03798d5cc7516f64715b157243036a5',1,'Road.RealPosition()']]],
+  ['redlight',['redLight',['../class_traffic_light.html#afa58c7be11027e6d7c7b0869fe170952',1,'TrafficLight']]],
+  ['region',['Region',['../_region_8cs.html#a81a01a86de31071a92e6cce0bab9bc4b',1,'Region.cs']]],
+  ['region_2ecs',['Region.cs',['../_region_8cs.html',1,'']]],
+  ['regionmenu',['regionMenu',['../class_g_u_i.html#a0c5bb85083eb0bd69fd1ee584b58d20e',1,'GUI']]],
+  ['remembertime',['RememberTime',['../class_smart_gps.html#aac506e0152adfc26a9b7c31438f294c7',1,'SmartGps']]],
+  ['removeagents',['RemoveAgentS',['../class_controller.html#a3518b46d01eaa4c86cfd0286f5ee0ff8',1,'Controller']]],
+  ['removecrossroads',['RemoveCrossroads',['../class_map.html#ae141bb19ef213b1a981ef6f96db9c2c1',1,'Map']]],
+  ['removefromcollidingobjects',['RemoveFromCollidingObjects',['../class_agent_d.html#a11947e5e8771d94a1f6c81b7cfbd99ff',1,'AgentD']]],
+  ['removeroad',['RemoveRoad',['../class_controller.html#a96ced55ec0d39c7fa18223835817962d',1,'Controller.RemoveRoad()'],['../class_map.html#a1b034c6fe105ea235b304a41ba40643a',1,'Map.RemoveRoad()']]],
+  ['resetifneeded',['ResetIfNeeded',['../class_agent_d.html#ad2071e50ce1c4b88e0bd3ec127bab22e',1,'AgentD']]],
+  ['resettime',['resetTime',['../class_agent_d.html#a87388a2df5f0166d9eb6929e73827f26',1,'AgentD']]],
+  ['resetvelocity',['resetVelocity',['../class_agent_d.html#a581734e6cbd2757e4798b23fd457e445',1,'AgentD']]],
+  ['residential',['Residential',['../_region_8cs.html#a81a01a86de31071a92e6cce0bab9bc4babcc360244e3a85db42d6c34c856e44e8',1,'Region.cs']]],
+  ['residentialregionprefab',['residentialRegionPrefab',['../class_controller.html#a1bd38e417a35466b3d14fafb9deb2e58',1,'Controller']]],
+  ['road',['Road',['../class_road.html',1,'']]],
+  ['road_2ecs',['Road.cs',['../_road_8cs.html',1,'']]],
+  ['roadendlist',['RoadEndList',['../class_map_file_content.html#a9f35e4ab0128b7f4c0075be3428742b5',1,'MapFileContent']]],
+  ['roadmenu',['roadMenu',['../class_g_u_i.html#a9e3e35121e3adb5c381e5f22b5e7ff0f',1,'GUI']]],
+  ['roadprefab',['roadPrefab',['../class_map.html#af2f9fdd559cf5b71ea7ceb77f3152e88',1,'Map']]],
+  ['roadstartlist',['RoadStartList',['../class_map_file_content.html#a5988e897245240c95bfbab1ceeb93c55',1,'MapFileContent']]]
+];

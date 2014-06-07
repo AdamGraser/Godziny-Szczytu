@@ -3,7 +3,8 @@
 /**<summary>Klasa wyswietlajaca podany komunikat</summary>*/
 public class Box : MonoBehaviour
 {
-    public string Text { set; get; } //tekst, ktory bedzie wyswietlany
+    /**<summary>Teskt, ktory zostanie wyswietlony</summary>*/
+    public string Text { set; get; }
 
     /**<summary>Pozycja i rozmiar kontrolki</summary>*/
     private Rect rect;
@@ -20,7 +21,7 @@ public class Box : MonoBehaviour
      *                        FUNKCJE ODZIEDZICZONE PO MONOBEHAVIOUR 
      * *********************************************************************************** */
 
-    /**<summary>Funkcja rysujaca kontrolke</summary*/
+    /**<summary>Funkcja rysujaca kontrolke</summary>*/
     protected void OnGUI()
     {
         UnityEngine.GUI.Box(rect, Text);

@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable()]
 public class Vector2Serializable : ISerializable
 {
-    //vector 2
+    /**<summary>Vector2, ktory ma zostac zapisany lub odczytany z pliku</summary>*/
     public Vector2 Vect { set; get; }
 
     /**<summary>Konstruktor na potrzeby Serializable - stosowac podczas zapisu</summary>*/

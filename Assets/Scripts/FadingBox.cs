@@ -5,7 +5,7 @@ using UnityEngine;
 public class FadingBox : Box
 {
     private float selfDestructTime;
-    /**<summaryCzas, przez ktory kotrolka bedzie istniec</summary>*/
+    /**<summary>Czas, przez ktory kotrolka bedzie istniec</summary>*/
     public float SelfDestructTime
     {
         set
